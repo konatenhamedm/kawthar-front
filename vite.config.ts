@@ -14,9 +14,9 @@ export default defineConfig({
 			}
 		}
 	},
-	build: {
+	/* build: {
 		rollupOptions: {
 		  external: ['cookie'] // ← éviter de le bundler
 		}
-	  }
+	  } */
 });
