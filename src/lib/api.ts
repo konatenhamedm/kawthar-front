@@ -1,5 +1,4 @@
-import cookie from "cookie";
-
+import * as cookie from 'cookie';
 export const BASE_URL_API = "https://back.kawthar-expertise.com/web";
 export const BASE_URL_API_LOGIN = "http://192.168.0.198:8000/web";
 export const BASE_URL_API_UPLOAD = "https://back.kawthar-expertise.com/uploads/";
