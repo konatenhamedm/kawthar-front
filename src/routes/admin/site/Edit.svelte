@@ -1,0 +1,169 @@
+<script lang="ts">
+	import InputSimple from '$components/inputs/InputSimple.svelte';
+	import { BASE_URL_API } from '$lib/api';
+	import { Button, Modal, Select } from 'flowbite-svelte';
+	import Notification from '$components/_includes/Notification.svelte';
+	import InputSelect from '$components/inputs/InputSelect.svelte';
+	import { onMount } from 'svelte';
+
+	export let open: boolean = false; // modal control
+	let isLoad = false;
+
+	let showNotification = false;
+	let notificationMessage = '';
+	let notificationType = 'info';
+
+	// Initializing the user object with only email and status
+	let user: any = {
+		nom: '',
+		prenoms: '',
+		tel: '',
+		email: '',
+		d_type: ''
+	};
+
+	export let data: Record<string, string> = {};
+
+	function init(form: HTMLFormElement) {
+
+        user.nom = data?.nom,
+        user.prenoms = data?.prenoms,
+        user.tel = data?.tel,
+        user.email = data?.email,
+        user.d_type = data?.d_type
+    }
+
+	onMount(() => {});
+
+	async function SaveFunction() {
+		isLoad = true;
+		try {
+			const res = await fetch(BASE_URL_API + '/auth/upfate/'+data?.id, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					email: user.email,
+                    tel: user.tel,
+                    login:user.login,
+                    nom:user.nom,
+                    prenoms:user.prenoms,
+                    d_type:user.d_type,
+                    fcm_token:''
+					
+				})
+			});
+			console.log('content res', res);
+
+			if (res.ok) {
+				isLoad = false;
+				open = false;
+				notificationMessage = 'Utilisateur modifié avec succès!';
+				notificationType = 'success';
+				showNotification = true;
+			} else if (res.status === 400) {
+				
+				notificationMessage = 'Utilisateur déjà inscrit';
+				notificationType = 'error';
+				showNotification = true;
+			}
+		} catch (error) {
+			isLoad = false;
+
+			// Afficher une notification d'erreur
+			notificationMessage = error?.message;
+			notificationType = 'error';
+			showNotification = true;
+
+			console.error('Error saving:', error);
+		}
+	}
+
+	function handleModalClose(event: Event) {
+		if (isLoad) {
+			event.preventDefault();
+		}
+	}
+</script>
+
+<!-- Modal Content Wrapper -->
+<div class="space-y-4 rounded-lg bg-white p-6 shadow">
+	<!-- Card Body -->
+	<div class="space-y-6">
+		<form action="#" use:init>
+			<!-- Champ Email -->
+			<div class="grid grid-cols-2 gap-3">
+				<InputSimple
+					type="text"
+					fieldName="nom"
+					label="Nom"
+					bind:field={user.nom}
+					placeholder="Entrez le nom"
+				/>
+				<InputSimple
+					type="text"
+					fieldName="prenoms"
+					label="Prénoms"
+					bind:field={user.prenoms}
+					placeholder="Entrez les prénoms"
+				/>
+				<InputSimple
+					type="text"
+					fieldName="tel"
+					label="Télephone"
+					bind:field={user.tel}
+					placeholder="Entrez le télephone"
+				/>
+				<InputSimple
+					type="email"
+					fieldName="email"
+					label="Email"
+					bind:field={user.email}
+					placeholder="Entrez l'email"
+				/>
+				
+			</div>
+            <div class="grid grid-cols-1 gap-3">
+                <InputSelect
+                label="Type utilisateur" 
+                bind:selectedId={user.d_type}
+                datas={[
+                    { id: "agent", libelle: "Agent" },
+                    { id: "client", libelle: "Client" },
+                    { id: "admin", libelle: "Admin" },
+                    
+                ]}
+                id="role"
+            />
+            </div>
+		</form>
+	</div>
+
+	<!-- Card Footer -->
+	<div class="flex justify-end border-t border-gray-200 pt-4">
+		{#if isLoad}
+			<button
+				disabled
+				class="cursor-not-allowed rounded bg-blue-500 px-4 py-2 text-white opacity-50"
+			>
+				<div class="flex items-center space-x-2">
+					<div class="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
+					<span>Chargement...</span>
+				</div>
+			</button>
+		{:else}
+			<button
+				on:click={SaveFunction}
+				class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+			>
+				Enregistrer
+			</button>
+		{/if}
+	</div>
+</div>
+
+<!-- Notification Component -->
+{#if showNotification}
+	<Notification message={notificationMessage} type={notificationType} duration={5000} />
+{/if}

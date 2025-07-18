@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+
+.bg-\[\#f8f9fb\] {
+    --tw-bg-opacity: 1;
+    background-color: #00baff !important;
+}
+
+.modale_general {
+    padding: 1rem; /* ou la taille désirée */
+    margin: 0 auto !important;
+  }
+
+  .bg-secondary {
+    --tw-bg-opacity: 1;
+    background-color: #00baff !important;
+
+  }
