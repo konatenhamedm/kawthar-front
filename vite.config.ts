@@ -13,5 +13,10 @@ export default defineConfig({
 				rewrite: (path) => path.replace(/^\/api/, '/api')
 			}
 		}
-	}
+	},
+	build: {
+		rollupOptions: {
+		  external: ['cookie'] // ← éviter de le bundler
+		}
+	  }
 });
