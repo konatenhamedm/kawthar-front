@@ -71,10 +71,10 @@
 			(user.d_type = data?.d_type));
 	}
 
-	onMount(() => {});
+
 
 	async function SaveFunction() {
-		console.log('Mission à enregistrer:', mission);
+
 		//isLoad = true;
 		try {
 			const res = await fetch(BASE_URL_API + '/auth/upfate/' + data?.id, {
