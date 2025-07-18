@@ -4,19 +4,20 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
-	/* server: {
+	server: {
 		proxy: {
-			'/api': {
-				target: 'https://back.kawthar-expertise.com',
-				changeOrigin: true,
-				secure: false,
-				rewrite: (path) => path.replace(/^\/api/, '/api')
-			}
+		  '/api': {
+			target: 'https://back.kawthar-expertise.com',
+			changeOrigin: true,
+			secure: false, // Désactiver si le certificat SSL est auto-signé
+			rewrite: (path) => path.replace(/^\/api/, '/api') // Garde le préfixe
+		  }
 		}
-	}, */
-	/* build: {
+	  },
+	
+	build: {
 		rollupOptions: {
 		  external: ['cookie'] // ← éviter de le bundler
 		}
-	  } */
+	  }
 });
