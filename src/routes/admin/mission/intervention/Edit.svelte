@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { clamp } from './../../../../../node_modules/date-fns/fp/clamp.js';
+
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
