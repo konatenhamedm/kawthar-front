@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
-	server: {
+	/* server: {
 		proxy: {
 			'/api': {
 				target: 'https://back.kawthar-expertise.com',
@@ -13,7 +13,7 @@ export default defineConfig({
 				rewrite: (path) => path.replace(/^\/api/, '/api')
 			}
 		}
-	},
+	}, */
 	/* build: {
 		rollupOptions: {
 		  external: ['cookie'] // ← éviter de le bundler
