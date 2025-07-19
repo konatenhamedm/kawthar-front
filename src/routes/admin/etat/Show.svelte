@@ -16,71 +16,20 @@
 	let notificationType = 'info';
 
 	// Initializing the user object with only email and status
-	let user: any = {
-		nom: '',
-		prenoms: '',
-		tel: '',
-		email: '',
-		d_type: ''
+	let item: any = {
+		libelle: '',
 	};
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
 
-        user.nom = data?.nom,
-        user.prenoms = data?.prenoms,
-        user.tel = data?.tel,
-        user.email = data?.email,
-        user.d_type = data?.d_type
+		item.libelle = data?.libelle
     }
 
 	onMount(() => {});
 
-	async function SaveFunction() {
-		isLoad = true;
-		try {
-			const res = await fetch(BASE_URL_API + '/auth/upfate/'+data?.id, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: user.email,
-                    tel: user.tel,
-                    login:user.login,
-                    nom:user.nom,
-                    prenoms:user.prenoms,
-                    d_type:user.d_type,
-                    fcm_token:''
-					
-				})
-			});
-			console.log('content res', res);
-
-			if (res.ok) {
-				isLoad = false;
-				open = false;
-				notificationMessage = 'Utilisateur modifié avec succès!';
-				notificationType = 'success';
-				showNotification = true;
-			} else if (res.status === 400) {
-				
-				notificationMessage = 'Utilisateur déjà inscrit';
-				notificationType = 'error';
-				showNotification = true;
-			}
-		} catch (error) {
-			isLoad = false;
-
-			// Afficher une notification d'erreur
-			notificationMessage = error?.message;
-			notificationType = 'error';
-			showNotification = true;
-
-			console.error('Error saving:', error);
-		}
-	}
+	
 
 	function handleModalClose(event: Event) {
 		if (isLoad) {
@@ -98,43 +47,16 @@
     <!-- Card Body -->
     <div class="space-y-6">
         <form action="#" use:init>
-			<div class="grid grid-cols-2 gap-1 mb-1">
+			<div class="grid grid-cols-1 gap-1 mb-1">
 				<div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Nom</label>
+					<label class="font-semibold text-gray-700">Libelle</label>
 					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.nom || "Non spécifié"}
-					</div>
-				</div>
-
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Prénoms</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.prenoms || "Non spécifié"}
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Téléphone</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.tel || "Non spécifié"}
-					</div>
-				</div>
-
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Email</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.email || "Non spécifié"}
+						{item.libelle || "Non spécifié"}
 					</div>
 				</div>
 
 			</div>
-            <div class="grid grid-cols-1 gap-1 mb-1">
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Type utilisateur</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.d_type || "Non spécifié"}
-					</div>
-				</div>
-            </div>
+            
 			
 
 		</form>

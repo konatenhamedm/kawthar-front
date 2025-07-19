@@ -30,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(false, '/equipes');
+			const res = await apiFetch(true, '/equipes');
 			if (res) {
-				main_data = res.data.data as Equipe[];
+				main_data = res.data as Equipe[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -185,7 +185,7 @@
 									</div>
 								</th>
 
-								{#each ['Lebelle', "Chef équipe"] as title}
+								{#each ['Libelle', "Chef équipe"] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -259,7 +259,7 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.chef_equipe_id}</td
+											{item.chefEquipe.nom} {item.chefEquipe.prenoms}</td
 										>
 										
 										<td

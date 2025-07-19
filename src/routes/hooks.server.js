@@ -1,57 +1,34 @@
-import cookie from "cookie";
-import { redirect } from "@sveltejs/kit";
-import { BASE_URL_API } from "$lib/api";
+import cookie from 'cookie';
+import { redirect } from '@sveltejs/kit';
+import { getAuthCookie, logout } from "$lib/auth";
+
 
 export async function handle({ event, resolve }) {
-  const cookies = cookie.parse(event.request.headers.get("cookie") || "");
-  let user = null;
-  let abonnementExpire = false;
+    const cookies = cookie.parse(event.request.headers.get('cookie') || '');
+    // Lire et décoder le cookie auth
+    let user = null;
+    if (cookies.auth) {
+        try {
+            const auth = JSON.parse(cookies.auth);
+            user = { id: auth.id, role: auth.nom,token:auth.prenom };
 
-  if (cookies.auth) {
-    try {
-      const auth = JSON.parse(cookies.auth);
-      user = {
-        id: auth.id ,
-        nom: auth.nom ,
-        prenoms: auth.prenoms ,
-        tel: auth.tel || "",
-        d_type: auth.d_type ,
-        email: auth.email,
-        token: auth.token ,
-      };
-      
-
-    } catch (e) {
-      console.error("Erreur parsing ou appel API:", e);
+            
+        } catch (e) {
+            console.error('Erreur de parsing du cookie auth:', e);
+        }
     }
-  }
 
-  // ⛔ Redirection pour les pages restreintes si abonnement expiré
-  const protectedPagesWhenExpired = [
-    "/site/dossiers",
-    "/site/forum",
-    "/site/documents",
-    "/site/chatbox",
-    "/site/forum/all-forums",
-    "/site/faq",
-    "/site/alerte",
-    "/site/profil"
-  ];
+    // Protéger la route /admin en vérifiant l'authentification
+    if (event.url.pathname.startsWith('/admin') && !user) {
+        // Redirection si l'utilisateur n'est pas authentifié
+        return redirect(302, '/');
+    }
+    if (event.url.pathname == "/" && user) {
+        // Redirection si l'utilisateur n'est pas authentifié
+        return redirect(302,'/admin');
+    }
 
-  
-  // Redirections basées sur le rôle
-  if (event.url.pathname.startsWith("/admin") && !user) {
-    return redirect(302, "/login");
-  }
-
-  if (event.url.pathname === "/login" && user) {
-    return redirect(302, "/admin");
-  }
-
-
-
-  // Attache l'utilisateur dans `event.locals` pour y accéder ailleurs
-  event.locals.user = user;
-  const response = await resolve(event);
-  return response;
+    // Continuer la requête si tout va bien
+    const response = await resolve(event);
+    return response;
 }

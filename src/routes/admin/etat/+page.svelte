@@ -11,13 +11,13 @@
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../store';
 	import { get } from 'svelte/store';
-	import type { User } from '../../../types';
+	import type { Equipe, User } from '../../../types';
 	import Add from './Add.svelte';
 	import Show from './Show.svelte';
 	import Delete from './Delete.svelte';
 	import Menu from '$components/_includes/Menu.svelte';
 
-	let main_data: User[] = [];
+	let main_data: Equipe[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -30,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/auth/agent/all');
+			const res = await apiFetch(true, '/etats');
 			if (res) {
-				main_data = res.data as User[];
+				main_data = res.data as Equipe[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -50,10 +50,7 @@
 
 	$: filteredData = main_data.filter((item) => {
 		return (
-			item.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			item.prenoms.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			item.tel.toLowerCase().includes(searchQuery.toLowerCase())
+			item.libelle.toLowerCase().includes(searchQuery.toLowerCase()) 
 		);
 	});
 
@@ -119,13 +116,14 @@
 			color: 'danger'
 		}
 	];
+
 	function handlePageChange(event: CustomEvent) {
 		currentPage = event.detail;
 	}
 </script>
 
 <div class=" ssm:mt-[30px] mx-[30px] mt-[15px] mb-[30px] min-h-[calc(100vh-195px)]">
-	<Abercrome titre="User" parent="Dashbord" current="sss" />
+	<Abercrome titre="etats" parent="Dashbord" current="etats" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
 		<div
@@ -137,7 +135,7 @@
 				<h1
 					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap capitalize"
 				>
-					Liste des etudiants
+					Liste des etats
 				</h1>
 
 				<button
@@ -181,13 +179,13 @@
 											class="border-normal checked:border-primary checked:bg-primary dark:border-dark-border dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary indeterminate:border-primary indeterminate:bg-primary relative me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] cursor-none appearance-none rounded-[0.25rem] border-1 border-solid outline-none before:pointer-events-none before:absolute before:h-[10px] before:w-[0.5px] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:content-[''] after:top-[2px] checked:before:opacity-[0.16] checked:after:absolute checked:after:ms-[5px] checked:after:mt-0 checked:after:block checked:after:h-[10px] checked:after:w-[5px] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-t-0 checked:after:border-l-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] indeterminate:after:absolute indeterminate:after:ms-[4px] indeterminate:after:mt-[5px] indeterminate:after:w-[0.5rem] indeterminate:after:border-[0.05rem] indeterminate:after:border-solid indeterminate:after:border-white hover:cursor-pointer hover:before:opacity-[0.04] indeterminate:focus:after:w-[0.5rem] indeterminate:focus:after:rounded-none indeterminate:focus:after:border-[0.125rem] indeterminate:focus:after:border-r-0 indeterminate:focus:after:border-b-0 indeterminate:focus:after:border-l-0 ltr:ltr:float-left rtl:float-right rtl:ltr:float-right"
 											type="checkbox"
 											id="checkAllExport"
-											value=""
+											value
 											aria-label="..."
 										/>
 									</div>
 								</th>
 
-								{#each ['Nom', 'Prénoms', 'Télephone', 'email'] as title}
+								{#each ['Libelle'] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -197,7 +195,7 @@
 								{/each}
 
 								<th
-									scope="col"
+									scope="col" style="width: 200px;text-align: center;"
 									class="dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] border-none bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase before:hidden"
 								>
 									Action</th
@@ -236,7 +234,7 @@
 							{:else}
 								{#each paginatedData as item, i}
 									<tr class="group">
-										<td
+										<td 
 											class="text-dark dark:text-title-dark text-15 w-[60px] rounded-s-[6px] border-none px-[25px] py-2.5 pt-[15px] text-start font-medium group-hover:bg-transparent before:hidden last:text-end"
 										>
 											<div class="mb-[0.125rem] block min-h-[1.5rem]">
@@ -251,32 +249,14 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
 										>
-											{item.nom}</td
+											{item.libelle}</td
 										>
-										<!-- <td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase group-hover:bg-transparent last:text-end"
-										>
-											{item.nom}</td
-										> -->
-										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.prenoms}</td
-										>
-										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.tel}</td
-										>
-										<td
-											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.email}</td
-										>
+										
+										
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
 										>
-                                        <Menu item={item} onAction={handleAction} {actions} />
+                                        <Menu item={item} onAction={handleAction} {actions}/>
 											
 										</td>
 									</tr>
@@ -305,16 +285,16 @@
 <!-- <Show bind:open={openShow} data={current_data} sizeModal='md'/>
 <Delete bind:open={openDelete} data={current_data}  on:deleted={fetchData}/> -->
 
-<Modale bind:open={openAdd} size="xl" title="Créer un utilisateur">
+<Modale bind:open={openAdd} size="xl" title="Créer un etat">
 	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un utilisateur">
+<Modale bind:open={openEdit} size="xl" title="Modifier un etat">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openShow} size="xl" title="Détails d'un utilisateur">
+<Modale bind:open={openShow} size="xl" title="Détails d'un etat">
 	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un utilisateur">
+<Modale bind:open={openDelete} size="xl" title="Supprimer un etat">
 	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
 </Modale>
 

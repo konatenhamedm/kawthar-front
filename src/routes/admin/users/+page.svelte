@@ -30,7 +30,7 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/auth/agent/all');
+			const res = await apiFetch(false, '/auth/users/all');
 			if (res) {
 				main_data = res.data as User[];
 				console.log('Données récupérées avec succès:', main_data);
@@ -98,6 +98,27 @@
 			openDelete = true;
 		}
 	};
+
+	const actions =[
+		{
+			action: 'view',
+			title: 'Voir',
+			icon: 'eye',
+			color: 'primary'
+		},
+		{
+			action: 'edit',
+			title: 'Modifier',
+			icon: 'edit',
+			color: 'warning'
+		}
+		,{
+			action: 'delete',
+			title: 'Supprimer',
+			icon: 'trash-alt',
+			color: 'danger'
+		}
+	];
 
 	function handlePageChange(event: CustomEvent) {
 		currentPage = event.detail;
@@ -167,7 +188,7 @@
 									</div>
 								</th>
 
-								{#each ['Nom', 'Prénoms', 'Télephone', 'email'] as title}
+								{#each ['Nom', 'Prénoms', 'Télephone', 'email','Type utilisateur'] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -251,72 +272,50 @@
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.email}</td
+											{item.email}</td>
+										<td
+											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
+											{item.d_type}</td>
+
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
 										>
-                                        <Menu item={item} onAction={handleAction} />
-											<!-- <button
-												on:click={() => ((current_data = item), openShow = true)}
-												class="hover:bg-primary border-primary text-primary [&amp;&gt;span]:inline-flex inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold capitalize transition duration-300 ease-in-out hover:text-white"
-											>
-												<i class="uil uil-eye"></i>
-											</button>
-											<button
-												on:click={() => ((current_data = item), (openEdit = true))}
-												class="hover:bg-warning border-warning text-primary [&amp;&gt;span]:inline-flex inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid bg-transparent px-[10px] text-[6px] leading-[22px] font-semibold capitalize transition duration-300 ease-in-out hover:text-white"
-											>
-												<i class="uil uil-edit"></i>
-											</button>
-											<button
-												on:click={() => ((current_data = item), (openDelete = true))}
-												class="hover:bg-danger border-danger text-primary [&amp;&gt;span]:inline-flex inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid bg-transparent px-[10px] text-[6px] leading-[22px] font-semibold capitalize transition duration-300 ease-in-out hover:text-white"
-											>
-												<i class="uil uil-trash-alt"></i>
-											</button> -->
-										</td>
-									</tr>
-								{/each}
-							{/if}
-						</tbody>
-					</table>
-					{#if filteredData.length > 0 && totalPages > 1}
-						<Pagination
-							{currentPage}
-							{totalPages}
-							{startRange}
-							{endRange}
-							totalItems={filteredData.length}
-							on:pageChange={handlePageChange}
-						/>
-					{/if}
+										<Menu item={item} onAction={handleAction} {actions}/>
+											
+									</td>
+								</tr>
+							{/each}
+						{/if}
+					</tbody>
+				</table>
+				{#if filteredData.length > 0 && totalPages > 1}
+					<Pagination
+						{currentPage}
+						{totalPages}
+						{startRange}
+						{endRange}
+						totalItems={filteredData.length}
+						on:pageChange={handlePageChange}
+					/>
+				{/if}
 
-				</div>
 			</div>
 		</div>
 	</div>
 </div>
-<!-- <Add bind:open={openAdd} data={current_data} sizeModal='md' on:added={fetchData}/> -->
-<!-- <Edit bind:open={openEdit} data={current_data} sizeModal='md' on:updated={fetchData}/> -->
-<!-- <Show bind:open={openShow} data={current_data} sizeModal='md'/>
-<Delete bind:open={openDelete} data={current_data}  on:deleted={fetchData}/> -->
+</div>
 
-<Modale bind:open={openAdd} size="xl" title="Créer un utilisateur">
-	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
-</Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un utilisateur">
-	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
-</Modale>
-<Modale bind:open={openShow} size="xl" title="Détails d'un utilisateur">
-	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
-</Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un utilisateur">
-	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
-</Modale>
 
-<!-- <Modal bind:open={openEdit} title="Gestion" on:close={fetchData} size={'lg'} >
-
-      <Edit item={current_data} close={fetchData}    />
-   
-  </Modal> -->
+<Modale bind:open={openAdd} size="xl" title="Créer un site">
+<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
+</Modale>
+<Modale bind:open={openEdit} size="xl" title="Modifier un site">
+<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
+</Modale>
+<Modale bind:open={openShow} size="xl" title="Détails d'un site">
+<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
+</Modale>
+<Modale bind:open={openDelete} size="xl" title="Supprimer un site">
+<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
+</Modale>

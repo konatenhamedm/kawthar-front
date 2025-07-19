@@ -1,6 +1,6 @@
 <script lang="ts">
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { BASE_URL_API } from '$lib/api';
+	import { apiFetch, BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
@@ -38,33 +38,25 @@
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await fetch(BASE_URL_API + '/auth/upfate/'+data?.id, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
+			const res = await  apiFetch(false,'/auth/update/'+ data?.id,"PUT",{
 					email: user.email,
                     tel: user.tel,
-                    login:user.login,
                     nom:user.nom,
                     prenoms:user.prenoms,
                     d_type:user.d_type,
-                    fcm_token:''
+                
 					
 				})
-			});
-			console.log('content res', res);
-
-			if (res.ok) {
+			
+			if (res) {
 				isLoad = false;
 				open = false;
-				notificationMessage = 'Utilisateur modifié avec succès!';
+				notificationMessage = 'Utilisateur créé avec succès!';
 				notificationType = 'success';
 				showNotification = true;
-			} else if (res.status === 400) {
+			} else {
 				
-				notificationMessage = 'Utilisateur déjà inscrit';
+				notificationMessage = res.message;
 				notificationType = 'error';
 				showNotification = true;
 			}

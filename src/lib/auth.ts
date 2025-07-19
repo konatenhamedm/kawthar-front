@@ -6,7 +6,7 @@ import { BASE_URL_API_LOGIN,BASE_URL_API } from './api';
 
 export async function login(username_field: string, password: string) {
   try {
-      const response = await fetch(`${BASE_URL_API_LOGIN}/auth/login`, {
+      const response = await fetch(`${BASE_URL_API}/auth/login`, {
           method: 'POST',
           headers: {
             'accept':'application/json',

@@ -17,7 +17,11 @@ export interface Equipe {
   id: number;
   libelle: string;
   chef_equipe_id: number;
-  chef_equipe: number;
+  chefEquipe: {
+    id:number,
+    nom: string,
+    prenoms: string
+  };
   description: any;
 }
 

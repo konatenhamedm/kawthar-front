@@ -25,6 +25,7 @@
         { title: "Equipes", path: `${BASE_PATH}/equipe` },
         { title: "Sites", path: `${BASE_PATH}/site` },
         { title: "Etats", path: `${BASE_PATH}/etat` },
+        { title: "Utilité", path: `${BASE_PATH}/utilite` },
       ]
     },
     {

@@ -1,5 +1,22 @@
 <script lang="ts">
-    export let user:any;
+   
+
+    import { onMount } from "svelte";
+  import type { User } from "../../types";
+	import { getAuthCookie, logout } from "$lib/auth";
+
+   let user: User = [];
+  function handleLogout() {
+    logout();
+    window.location.href = "/";
+  }
+
+  onMount(async () => {
+    user = getAuthCookie();
+
+	console.log("YFKKUYFEYFE",user.nom)
+  });
+
     </script>
      <header class="sticky top-0 flex w-full bg-white xl:z-[999] max-xl:z-[9999] drop-shadow-1 dark:bg-box-dark dark:drop-shadow-none min-h-[70px]">
         <!-- Navigation -->
@@ -70,7 +87,7 @@
                        <button type="button" id="author-dropdown" data-te-dropdown-toggle-ref aria-expanded="false" class="flex items-center me-1.5 text-body dark:text-subtitle-dark text-sm font-medium capitalize rounded-full md:me-0 group whitespace-nowrap">
                           <span class="sr-only">Open user menu</span>
                           <img class="min-w-[32px] w-8 h-8 rounded-full xl:me-2" src="/images/avatars/thumbs.png" alt="user photo">
-                          <span class="hidden xl:block">Shamim Ahmed</span>
+                          <span class="hidden xl:block">{user?.nom} {user?.prenoms}</span>
                           <i class="uil uil-angle-down text-light dark:text-subtitle-dark text-[18px] hidden xl:block"></i>
                        </button>
 
@@ -79,7 +96,7 @@
                           <div class="min-w-[310px] max-sm:min-w-full pt-4 px-[15px] py-[12px] bg-white dark:bg-box-dark shadow-[0_2px_8px_rgba(0,0,0,.15)] dark:shadow-[0_5px_30px_rgba(1,4,19,.60)] rounded-4">
                              
                              
-                             <a class="flex items-center justify-center text-sm font-medium bg-normalBG dark:bg-box-dark-up h-[50px] text-light hover:text-primary dark:hover:text-subtitle-dark dark:text-title-dark mx-[-15px] mb-[-15px] rounded-b-6 gap-[6px]" href="log-in.html">
+                             <a class="flex items-center justify-center text-sm font-medium bg-normalBG dark:bg-box-dark-up h-[50px] text-light hover:text-primary dark:hover:text-subtitle-dark dark:text-title-dark mx-[-15px] mb-[-15px] rounded-b-6 gap-[6px]" href="#" on:click={handleLogout}>
                                 <i class="uil uil-sign-out-alt"></i>Déconnexion</a>
                           </div>
                        </div>

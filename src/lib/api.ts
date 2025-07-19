@@ -1,7 +1,7 @@
 import * as cookie from 'cookie';
 export const BASE_URL_API_LOGIN = "https://back.kawthar-expertise.com/api";
-export const BASE_URL_API = "https://back.kawthar-expertise.com/api";
-export const BASE_URL_API_UPLOAD = "https://back.kawthar-expertise.com/web";
+export const BASE_URL_API = "https://back.kawthar-expertise.com/web";
+export const BASE_URL_API_UPLOAD = "https://back.kawthar-expertise.com/api";
 
 export async function apiFetch(
   provenance: boolean,

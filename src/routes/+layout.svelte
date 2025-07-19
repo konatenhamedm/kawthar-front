@@ -3,10 +3,14 @@
 	import { page } from '$app/stores';
 	import Side from '../components/_includes/Side.svelte';
 	import Footer from '../components/_includes/Footer.svelte';
-	import { onMount } from 'svelte';
-	import type { User } from '../types';
-	import { getAuthCookie } from '$lib/auth';
+
 	import Header from '../components/_includes/Header.svelte';
+
+	import { getAuthCookie, logout } from "$lib/auth";
+  import { onMount } from "svelte";
+
+
+
 
 	let { children } = $props();
 	let currentYear = new Date().getFullYear();
@@ -18,7 +22,7 @@
 		class="bg-normalBG dark:bg-main-dark relative flex flex-1 flex-col !transition-all delay-[0s] !duration-[0.2s] ease-linear xl:ps-[280px] xl:[&.TopExpanded]:ps-[0px] xl:[&.expanded]:ps-[80px]"
 		id="content"
 	>
-		<Header user={"data"} />
+		<Header />
 		<main class="bg-normalBG dark:bg-main-dark">
 			{@render children()}
 
