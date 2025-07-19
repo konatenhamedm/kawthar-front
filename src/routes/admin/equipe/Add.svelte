@@ -1,10 +1,13 @@
 <script lang="ts">
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { BASE_URL_API } from '$lib/api';
+	import { apiFetch, BASE_URL_API, BASE_URL_API_UPLOAD } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
+	import type { User } from '../../../types';
+	import InputTextArea from '$components/inputs/InputTextArea.svelte';
+	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
@@ -13,54 +16,51 @@
 	let notificationMessage = '';
 	let notificationType = 'info';
 
+	let userdata : any = [];
+
 	// Initializing the user object with only email and status
-	let user: any = {
-		nom: '',
-		prenoms: '',
-		tel: '',
-		email: '',
-		login: '',
-		password: '',
-		fcm_token: '',
-		d_type: ''
+	let item: any = {
+		libelle: '',
+		description: '',
+		chef_equipe_id: '',
 	};
 
 	export let data: Record<string, string> = {};
 
-	function init(form: HTMLFormElement) {}
+	async function getData() {
+    try {
+      const res = await apiFetch(true,  "/auth/users/all");
+      const data =  res.data;
+	  
+      userdata = data;
+    } catch (error) {
+      console.error("Error fetching villes:", error);
+    }
+  }
 
-	onMount(() => {});
+	function init(form: HTMLFormElement) {}
+	onMount(async () => {
+   await getData();
+  });
 
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await fetch(BASE_URL_API + '/auth/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: user.email,
-                    tel: user.tel,
-                    login:user.login,
-                    nom:user.nom,
-                    prenoms:user.prenoms,
-                    d_type:user.d_type,
-                    fcm_token:''
-					
-				})
-			});
-			console.log('content res', res);
-
-			if (res.ok) {
+			const res = await apiFetch(false,'/equipes/create','POST',{
+					libelle: item.libelle,
+                    description: item.description,
+                    chef_equipe_id:item.chef_equipe_id,
+				});
+			
+			if (res) {
 				isLoad = false;
 				open = false;
-				notificationMessage = 'Utilisateur créé avec succès!';
+				notificationMessage = res.message;
 				notificationType = 'success';
 				showNotification = true;
-			} else if (res.status === 400) {
+			} else  {
 				
-				notificationMessage = 'Utilisateur déjà inscrit';
+				notificationMessage = 'Une erreur est ';
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -92,60 +92,30 @@
 			<div class="grid grid-cols-2 gap-3">
 				<InputSimple
 					type="text"
-					fieldName="nom"
-					label="Nom"
-					bind:field={user.nom}
-					placeholder="Entrez le nom"
+					fieldName="libelle"
+					label="Libelle"
+					bind:field={item.libelle}
+					placeholder="Entrez le nom de l'équipe"
 				/>
-				<InputSimple
-					type="text"
-					fieldName="prenoms"
-					label="Prénoms"
-					bind:field={user.prenoms}
-					placeholder="Entrez les prénoms"
-				/>
-				<InputSimple
-					type="text"
-					fieldName="tel"
-					label="Télephone"
-					bind:field={user.tel}
-					placeholder="Entrez le télephone"
-				/>
-				<InputSimple
-					type="email"
-					fieldName="email"
-					label="Email"
-					bind:field={user.email}
-					placeholder="Entrez l'email"
-				/>
-				<InputSimple
-					type="text"
-					fieldName="login"
-					label="Login"
-					bind:field={user.login}
-					placeholder="Entrez le login"
-				/>
-				<InputSimple
-					type="password"
-					fieldName="password"
-					label="Mot de passe"
-					bind:field={user.password}
-					placeholder="Entrez le mot de passe"
-				/>
-			</div>
-            <div class="grid grid-cols-1 gap-3">
-                <InputSelect
-                label="Type utilisateur" 
-                bind:selectedId={user.d_type}
-                datas={[
-                    { id: "agent", libelle: "Agent" },
-                    { id: "client", libelle: "Client" },
-                    { id: "admin", libelle: "Admin" },
-                    
-                ]}
-                id="role"
+				
+			
+				<InputUserSelect
+                label="Chef équipe" 
+                bind:selectedId={item.chef_equipe_id}
+                datas={userdata}
+                id="chef_equipe_id"
             />
-            </div>
+			</div>
+            
+			<div class="grid grid-cols-1 gap-3">
+				
+				<InputTextArea fieldName="description"
+				label="Description"
+				bind:field={item.description}
+				placeholder="Entrez la description" />
+			
+			</div>
+            
 		</form>
 	</div>
 

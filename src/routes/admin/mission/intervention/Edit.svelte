@@ -167,7 +167,7 @@
 			</div>
 			<div class="col-span-12 shadow shadow-gray">
 				<div class="bg-blue dark:bg-box-dark m-0 p-0 text-body dark:text-subtitle-dark text-[15px] rounded-10">
-				   <div class="py-[16px] px-[25px] text-dark dark:text-title-dark font-medium text-[17px] border-b border-black dark:border-box-dark-up">
+				   <div style="background-color:rgb(254 162 3)" class="py-[16px] px-[25px] text-dark dark:text-title-dark font-medium text-[17px] border-b border-black dark:border-box-dark-up">
 					  <h4 class="mb-0 text-lg font-medium capitalize text-dark dark:text-title-dark">Liste des interventions</h4>
 				   </div>
 				   <div class="p-[25px] flex items-center gap-[15px]">

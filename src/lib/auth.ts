@@ -9,14 +9,14 @@ export async function login(username_field: string, password: string) {
       const response = await fetch(`${BASE_URL_API}/auth/login`, {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
+            'accept':'application/json',
+            'Content-type':'application/json'
           },
           body: JSON.stringify({ login: username_field, password })
       });
-      console.log(response);
-
+      
       const jsonData = await response.json();
+      
 
 
       if (!response.ok) {
@@ -35,7 +35,7 @@ export async function login(username_field: string, password: string) {
         },
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
       } */
-      const { token, user: { id, nom, prenoms, tel, email, login, d_type} } = jsonData;
+      const { token, user: { id, nom, prenoms, tel, email, login, d_type} } = jsonData.data;
 
       // Stocker l'objet utilisateur dans un cookie accessible côté client
       document.cookie = `auth=${encodeURIComponent(JSON.stringify({

@@ -7,8 +7,8 @@
     let notificationMessage = "";
     let notificationType = "info";
   
-    let username = "";
-    let password = "";
+    let username = "ko@gmail.com";
+    let password = "password123";
     $: authenticating = false;
     let showPassword = false; // To toggle password visibility
     $: message = "";
@@ -25,9 +25,9 @@
       try {
         const success = await login(username, password);
 
-        console.log(success.token);
+        console.log(success);
       
-        if (success.token != null) {
+        if (success.data.token != null) {
           window.location.href = "/admin";
         } else {
           message = "Veuillez vérifier vos identifiants";

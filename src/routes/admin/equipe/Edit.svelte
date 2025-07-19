@@ -1,36 +1,38 @@
 <script lang="ts">
+
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { BASE_URL_API } from '$lib/api';
+	import { apiFetch, BASE_URL_API, BASE_URL_API_LOGIN, BASE_URL_API_UPLOAD } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
+	import InputTextArea from '$components/inputs/InputTextArea.svelte';
+	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
-
+let userdata :any = [];
 	let showNotification = false;
 	let notificationMessage = '';
 	let notificationType = 'info';
 
-	// Initializing the user object with only email and status
-	let user: any = {
-		nom: '',
-		prenoms: '',
-		tel: '',
-		email: '',
-		d_type: ''
+	// Initializing the item object with only email and status
+	let item: any = {
+		libelle: '',
+		description: '',
+		chef_equipe_id: '',
 	};
+
+	let itemdata : any = [];
+
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
 
-        user.nom = data?.nom,
-        user.prenoms = data?.prenoms,
-        user.tel = data?.tel,
-        user.email = data?.email,
-        user.d_type = data?.d_type
+        item.libelle = data?.libelle,
+        item.description = data?.description,
+        item.chef_equipe_id = data?.chef_equipe_id
     }
 
 	onMount(() => {});
@@ -38,25 +40,16 @@
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await fetch(BASE_URL_API + '/auth/upfate/'+data?.id, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: user.email,
-                    tel: user.tel,
-                    login:user.login,
-                    nom:user.nom,
-                    prenoms:user.prenoms,
-                    d_type:user.d_type,
-                    fcm_token:''
+			const res = await apiFetch(false , '/equipes/update/'+data?.id, "PUT",{
+					libelle: item.libelle,
+                    description: item.description,
+                    chef_equipe_id:item.chef_equipe_id,
 					
-				})
-			});
+				});
+		
 			console.log('content res', res);
 
-			if (res.ok) {
+			if (res) {
 				isLoad = false;
 				open = false;
 				notificationMessage = 'Utilisateur modifié avec succès!';
@@ -85,6 +78,20 @@
 			event.preventDefault();
 		}
 	}
+	async function getData() {
+    try {
+      const res = await apiFetch(true,  "/auth/users/all");
+      const data = await res.data;
+      userdata = data;
+    } catch (error) {
+      console.error("Error fetching villes:", error);
+    }
+  }
+
+	onMount(async () => {
+      await getData();
+  });
+
 </script>
 
 <!-- Modal Content Wrapper -->
@@ -96,47 +103,29 @@
 			<div class="grid grid-cols-2 gap-3">
 				<InputSimple
 					type="text"
-					fieldName="nom"
-					label="Nom"
-					bind:field={user.nom}
-					placeholder="Entrez le nom"
-				/>
-				<InputSimple
-					type="text"
-					fieldName="prenoms"
-					label="Prénoms"
-					bind:field={user.prenoms}
-					placeholder="Entrez les prénoms"
-				/>
-				<InputSimple
-					type="text"
-					fieldName="tel"
-					label="Télephone"
-					bind:field={user.tel}
-					placeholder="Entrez le télephone"
-				/>
-				<InputSimple
-					type="email"
-					fieldName="email"
-					label="Email"
-					bind:field={user.email}
-					placeholder="Entrez l'email"
+					fieldName="libelle"
+					label="Libelle"
+					bind:field={item.libelle}
+					placeholder="Entrez le nom de l'équipe"
 				/>
 				
-			</div>
-            <div class="grid grid-cols-1 gap-3">
-                <InputSelect
-                label="Type utilisateur" 
-                bind:selectedId={user.d_type}
-                datas={[
-                    { id: "agent", libelle: "Agent" },
-                    { id: "client", libelle: "Client" },
-                    { id: "admin", libelle: "Admin" },
-                    
-                ]}
-                id="role"
+			
+				<InputUserSelect
+                label="Chef équipe" 
+                bind:selectedId={item.chef_equipe_id}
+                datas={userdata}
+                id="chef_equipe_id"
             />
-            </div>
+			</div>
+            
+			<div class="grid grid-cols-1 gap-3">
+				
+				<InputTextArea fieldName="description"
+				label="Description"
+				bind:field={item.description}
+				placeholder="Entrez la description" />
+			
+			</div>
 		</form>
 	</div>
 
