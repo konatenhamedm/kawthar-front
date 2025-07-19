@@ -17,7 +17,7 @@ const config = {
 		),
 		alias: {
 			$components: path.resolve('./src/components'),
-			// Ajoutez d'autres alias si nécessaire
+			// Ajoutez d'autres alias si nécessaireddd
 		  },
 		  prerender: {
 			crawl: true, // Active ou désactive le crawl des liens internes
