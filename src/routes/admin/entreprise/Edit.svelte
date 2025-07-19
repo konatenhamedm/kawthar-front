@@ -19,7 +19,6 @@ let userdata :any = [];
 	// Initializing the item object with only email and status
 	let item: any = {
 		libelle: '',
-		code: '',
 	};
 
 	let itemdata : any = [];
@@ -30,7 +29,6 @@ let userdata :any = [];
 	function init(form: HTMLFormElement) {
 
         item.libelle = data?.libelle
-        item.code = data?.code
     }
 
 	onMount(() => {});
@@ -38,9 +36,8 @@ let userdata :any = [];
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true , '/typeMissions/update/'+data?.id, "PUT",{
-					libelle: item.libelle,
-					code: item.code
+			const res = await apiFetch(false , '/sites/update/'+data?.id, "PUT",{
+					libelle: item.libelle
 					
 				});
 		
@@ -98,13 +95,6 @@ let userdata :any = [];
 		<form action="#" use:init>
 			<!-- Champ Email -->
 			<div class="grid grid-cols-1 gap-3">
-				<InputSimple 
-					type="text"
-					fieldName="code"
-					label="Code"
-					bind:field={item.code}
-					placeholder="Entrez le code"
-				/>
 				<InputSimple
 					type="text"
 					fieldName="libelle"

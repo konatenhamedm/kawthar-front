@@ -21,6 +21,7 @@
 	// Initializing the user object with only email and status
 	let item: any = {
 		libelle: '',
+		code: '',
 	};
 
 	export let data: Record<string, string> = {};
@@ -34,7 +35,8 @@
 		isLoad = true;
 		try {
 			const res = await apiFetch(true,'/typeMissions/create','POST',{
-					libelle: item.libelle
+					libelle: item.libelle,
+					code: item.code
 				});
 			
 			if (res) {
@@ -75,6 +77,13 @@
 		<form action="#" use:init>
 			<!-- Champ Email -->
 			<div class="grid grid-cols-1 gap-3">
+				<InputSimple 
+					type="text"
+					fieldName="code"
+					label="Code"
+					bind:field={item.code}
+					placeholder="Entrez le code"
+				/>
 				<InputSimple
 					type="text"
 					fieldName="libelle"
@@ -82,6 +91,7 @@
 					bind:field={item.libelle}
 					placeholder="Entrez le nom de l'équipe"
 				/>
+				
 				
 			</div>
             

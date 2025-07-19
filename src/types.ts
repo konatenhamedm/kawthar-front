@@ -1,15 +1,41 @@
 
+export interface TypeMission {
+  id: number;
+  libelle: string;
+  code: string;
+}
 export interface Parametre {
   id: number;
   libelle: string;
 }
-export interface Mission {
+export interface Entreprise {
   id: number;
   libelle: string;
+  email: string;
+  tel: string;
+  commentaire: string;
+  adresse_geo: string;
+}
+
+
+export interface LigneEquipe {
+  id: any;
+  idF: any;
+  equipeId: any;
+  date_fin_intervention: any;
+  date_debut_intervention: string;
+  description: string;
+}
+
+export interface Mission {
+  libelle: string;
+  date_debut: string;
+  entrepriseMagasin: Entreprise[];
   description: any;
-  date_debut: any;
-  date_fin: any;
   adresse_mission: any;
+  date_fin: string;
+  typeMission: Parametre[];
+  ligneEquipes: LigneEquipe[];
 }
 
 

@@ -18,15 +18,13 @@
 	// Initializing the user object with only email and status
 	let item: any = {
 		libelle: '',
-		code: '',
 	};
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
 
-		item.libelle = data?.libelle,
-		item.code = data?.code
+		item.libelle = data?.libelle
     }
 
 	onMount(() => {});
@@ -51,18 +49,11 @@
         <form action="#" use:init>
 			<div class="grid grid-cols-1 gap-1 mb-1">
 				<div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Code</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{item.code || "Non spécifié"}
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
 					<label class="font-semibold text-gray-700">Libelle</label>
 					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
 						{item.libelle || "Non spécifié"}
 					</div>
 				</div>
-				
 
 			</div>
             

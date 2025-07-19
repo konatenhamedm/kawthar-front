@@ -1,60 +1,61 @@
 <script lang="ts">
-
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { apiFetch, BASE_URL_API, BASE_URL_API_LOGIN, BASE_URL_API_UPLOAD } from '$lib/api';
+	import { apiFetch, BASE_URL_API, BASE_URL_API_UPLOAD } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
+	import type { User } from '../../../types';
 	import InputTextArea from '$components/inputs/InputTextArea.svelte';
 	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
-let userdata :any = [];
+
 	let showNotification = false;
 	let notificationMessage = '';
 	let notificationType = 'info';
 
-	// Initializing the item object with only email and status
+	let userdata : any = [];
+
+	// Initializing the user object with only email and status
 	let item: any = {
-		libelle: '',
-		code: '',
+		
+  libelle: '',
+  email: '',
+  tel: '',
+  commentaire: '',
+  adresse_geo: '',
 	};
-
-	let itemdata : any = [];
-
 
 	export let data: Record<string, string> = {};
 
-	function init(form: HTMLFormElement) {
 
-        item.libelle = data?.libelle
-        item.code = data?.code
-    }
 
-	onMount(() => {});
+	function init(form: HTMLFormElement) {}
+	
 
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true , '/typeMissions/update/'+data?.id, "PUT",{
+			const res = await apiFetch(true,'/entrepriseMagasins/create','POST',{
 					libelle: item.libelle,
-					code: item.code
-					
-				});
-		
-			console.log('content res', res);
+					email: item.email,
+					tel: item.tel,
+					commentaire: item.commentaire,
+					adresse_geo: item.adresse_geo,
 
+				});
+			
 			if (res) {
 				isLoad = false;
 				open = false;
-				notificationMessage = 'Utilisateur modifié avec succès!';
+				notificationMessage = res.message;
 				notificationType = 'success';
 				showNotification = true;
-			} else {
+			} else  {
 				
-				notificationMessage = res.message;
+				notificationMessage = 'Une erreur est ';
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -75,20 +76,6 @@ let userdata :any = [];
 			event.preventDefault();
 		}
 	}
-	async function getData() {
-    try {
-      const res = await apiFetch(true,  "/auth/users/all");
-      const data = await res.data;
-      userdata = data;
-    } catch (error) {
-      console.error("Error fetching villes:", error);
-    }
-  }
-
-	onMount(async () => {
-      await getData();
-  });
-
 </script>
 
 <!-- Modal Content Wrapper -->
@@ -98,23 +85,44 @@ let userdata :any = [];
 		<form action="#" use:init>
 			<!-- Champ Email -->
 			<div class="grid grid-cols-1 gap-3">
-				<InputSimple 
-					type="text"
-					fieldName="code"
-					label="Code"
-					bind:field={item.code}
-					placeholder="Entrez le code"
-				/>
 				<InputSimple
 					type="text"
 					fieldName="libelle"
 					label="Libelle"
 					bind:field={item.libelle}
-					placeholder="Entrez le nom de l'équipe"
+					placeholder="Entrez le nom entreprise"
 				/>
+				<InputSimple
+					type="email"
+					fieldName="email"
+					label="Email"
+					bind:field={item.email}
+					placeholder="Entrez email"
+				/>
+				<InputSimple
+					type="text"
+					fieldName="tel"
+					label="Télephone"
+					bind:field={item.tel}
+					placeholder="Entrez le télephone entreprise"
+				/>
+				<InputTextArea
+					fieldName="adresse_geo"
+					label="Adresse géographique"
+					bind:field={item.adresse_geo}
+					placeholder="Entrez l'adresse géographique"
+				/>
+				<InputTextArea
+					fieldName="commentaire"
+					label="Commentaire"
+					bind:field={item.commentaire}
+					placeholder="Entrez un commentaire"
+				/>
+
 				
-			
 			</div>
+            
+			
             
 		</form>
 	</div>

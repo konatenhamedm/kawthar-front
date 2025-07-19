@@ -11,13 +11,13 @@
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../store';
 	import { get } from 'svelte/store';
-	import type { TypeMission, User } from '../../../types';
+	import type { Entreprise, User } from '../../../types';
 	import Add from './Add.svelte';
 	import Show from './Show.svelte';
 	import Delete from './Delete.svelte';
 	import Menu from '$components/_includes/Menu.svelte';
 
-	let main_data: TypeMission[] = [];
+	let main_data: Entreprise[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -30,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/typeMissions');
+			const res = await apiFetch(true, '/entrepriseMagasins');
 			if (res) {
-				main_data = res.data as TypeMission[];
+				main_data = res.data as Entreprise[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -123,7 +123,7 @@
 </script>
 
 <div class=" ssm:mt-[30px] mx-[30px] mt-[15px] mb-[30px] min-h-[calc(100vh-195px)]">
-	<Abercrome titre="typeMissions" parent="Dashbord" current="typeMissions" />
+	<Abercrome titre="entrepriseMagasins" parent="Dashbord" current="entrepriseMagasins" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
 		<div
@@ -133,9 +133,9 @@
 				class=" text-dark dark:text-title-dark border-regular dark:border-box-dark-up flex flex-wrap items-center justify-between border-b px-[25px] text-[17px] font-medium max-sm:h-auto max-sm:flex-col"
 			>
 				<h1
-					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
+					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap capitalize"
 				>
-					Liste des typeMissions
+					Liste des entreprise
 				</h1>
 
 				<button
@@ -185,7 +185,7 @@
 									</div>
 								</th>
 
-								{#each ['code','Libelle'] as title}
+								{#each ['Libelle','email',"Télephone",'adresse'] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -249,12 +249,22 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
 										>
-											{item.code}</td
+											{item.libelle}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
 										>
-											{item.libelle}</td
+											{item.email}</td
+										>
+										<td
+											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
+										>
+											{item.tel}</td
+										>
+										<td
+											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
+										>
+											{item.adresse_geo}</td
 										>
 										
 										
@@ -286,15 +296,16 @@
 	</div>
 </div>
 
-<Modale bind:open={openAdd} size="xl" title="Créer un type mission">
+
+<Modale bind:open={openAdd} size="xl" title="Créer une entreprise">
 	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un type mission">
+<Modale bind:open={openEdit} size="xl" title="Modifier l' entreprise">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openShow} size="xl" title="Détails de type mission">
+<Modale bind:open={openShow} size="xl" title="Détails de l'entreprise">
 	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un type mission">
+<Modale bind:open={openDelete} size="xl" title="Supprimer l'entreprise">
 	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
 </Modale>

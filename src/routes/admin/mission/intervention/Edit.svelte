@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
@@ -15,16 +14,10 @@
 	let notificationType = 'info';
 
 	// Initializing the user object with only email and status
-	let user: any = {
-		nom: '',
-		prenoms: '',
-		tel: '',
-		email: '',
-		d_type: ''
-	};
 
 	interface Intervention {
 		id: any;
+		idF: any;
 		description: string;
 		technicien: string;
 		duree: string;
@@ -32,9 +25,13 @@
 	}
 
 	interface Mission {
-		titre: string;
+		libelle: string;
 		date_debut: string;
+		entreprise_id: string;
+		description: any;
+		adresse_mission: any;
 		date_fin: string;
+		type_mission_id: string;
 		interventions: Intervention[];
 	}
 
@@ -44,8 +41,9 @@
 		date_debut: '',
 		date_fin: '',
 		interventions: [
-			{
+			/* {
 				id: '1',
+				idF: '1',
 				description: 'string',
 				technicien: 'string',
 				duree: 'string',
@@ -53,11 +51,12 @@
 			},
 			{
 				id: '2',
+				idF: '2',
 				description: 'djkhddjkhd',
 				technicien: 'KONATE',
 				duree: '2 jour',
 				prix: 25000 // Changé en number
-			}
+			} */
 		]
 	};
 
@@ -71,10 +70,7 @@
 			(user.d_type = data?.d_type));
 	}
 
-
-
 	async function SaveFunction() {
-
 		//isLoad = true;
 		try {
 			const res = await fetch(BASE_URL_API + '/auth/upfate/' + data?.id, {
@@ -128,7 +124,8 @@
 		mission.interventions = [
 			...mission.interventions,
 			{
-				id: Date.now(),
+				id: null,
+				idF: Date.now(),
 				description: '',
 				technicien: '',
 				duree: '',
@@ -144,8 +141,10 @@
 </script>
 
 <!-- Modal Content Wrapper -->
-<div class="space-y-4 rounded-lg bg-white p-6 shadow">
+<div class="space-y-4 rounded-lg bg-white p-2 ">
 	<!-- Card Body -->
+
+	
 	<div class="space-y-6">
 		<form action="#" use:init>
 			<!-- Champ Email -->
@@ -165,129 +164,97 @@
 					placeholder="Entrez les prénoms"
 				/>
 			</div>
-			<div class="col-span-12 shadow shadow-gray">
-				<div class="bg-blue dark:bg-box-dark m-0 p-0 text-body dark:text-subtitle-dark text-[15px] rounded-10">
-				   <div style="background-color:rgb(254 162 3)" class="py-[16px] px-[25px] text-dark dark:text-title-dark font-medium text-[17px] border-b border-black dark:border-box-dark-up">
-					  <h4 class="mb-0 text-lg font-medium capitalize text-dark dark:text-title-dark">Liste des interventions</h4>
-				   </div>
-				   <div class="p-[25px] flex items-center gap-[15px]">
-					  <div class="bg-gray dark:bg-box-dark m-0 p-0 text-body dark:text-subtitle-dark border-1 border-black dark:border-box-dark-up text-[15px] rounded-10 w-full">
-						
-						 <div>
-							<table class="min-w-full text-sm font-light text-center">
-							   <tbody>
-								 
-								  <tr>
-									 <td class="px-6 py-4 font-medium border-e border-black whitespace-nowrap dark:border-box-dark-up">
-										2
-									 </td>
-									 <td class="px-6 py-4 border-e border-regular whitespace-nowrap dark:border-box-dark-up">
-										Jacob
-									 </td>
-									 <td class="px-6 py-4 border-e border-black whitespace-nowrap dark:border-box-dark-up">
-										Thornton
-									 </td>
-									 <td class="px-6 py-4 whitespace-nowrap">@fat</td>
-								  </tr>
-							   </tbody>
-							</table>
-						 </div>
-					  </div>
-				   </div>
+			<div class="shadow-gray col-span-12 shadow">
+				<div
+					class="bg-blue dark:bg-box-dark text-body dark:text-subtitle-dark rounded-10 m-0 p-0 text-[15px]"
+				>
+					<div
+						style="background-color:rgb(254 162 3)"
+						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
+					>
+						<h4 class="text-white dark:text-title-dark mb-0 text-lg font-medium">
+							Liste des interventions
+						</h4>
+
+						<button
+							class="border-secondary inline-flex h-[40px] items-center justify-center gap-[6px] rounded-[6px] border-1 border-solid bg-black px-[20px] text-[14px] leading-[22px] font-semibold whitespace-nowrap text-white capitalize transition duration-300 ease-in-out hover:bg-black"
+							data-te-ripple-init=""
+							data-te-ripple-color="light"
+							style=""
+							on:click={ajouterIntervention}
+						>
+							<i class="uil uil-plus text-[18px]"></i>
+						</button>
+					</div>
+					<div class="flex items-center gap-[15px] p-[20px]">
+						<div
+							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
+						>
+							<div>
+								{#each mission.interventions as intervention, index (intervention.idF)}
+									<div class="grid grid-cols-12 items-end gap-3 border-b-2  border-black">
+										<!-- Durée - 3 colonnes -->
+										<div class="col-span-3">
+											<InputSimple
+												type="text"
+												fieldName="duree"
+												label="Durée"
+												bind:field={intervention.duree}
+												placeholder="Heures"
+											/>
+										</div>
+
+										<!-- Description - 4 colonnes -->
+										<div class="col-span-4">
+											<InputSimple
+												type="text"
+												fieldName="description"
+												label="Description"
+												bind:field={intervention.description}
+												placeholder="Description de l'intervention"
+											/>
+										</div>
+
+										<!-- Technicien - 3 colonnes -->
+										<div class="col-span-3">
+											<InputSimple
+												type="text"
+												fieldName="technicien"
+												label="Technicien"
+												bind:field={intervention.technicien}
+												placeholder="Nom du technicien"
+											/>
+										</div>
+
+										<!-- Prix - 1 colonne -->
+										<div class="col-span-1">
+											<InputSimple
+												type="text"
+												fieldName="prix"
+												label="Prix (€)"
+												bind:field={intervention.prix}
+												placeholder="0.00"
+											/>
+										</div>
+
+										<!-- Bouton suppression - 1 colonne -->
+										<div class="col-span-1 flex h-[42px] items-center justify-center">
+											<button style="margin-top: -21px;"
+												on:click={() => supprimerIntervention(intervention.idF)}
+												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] text-white leading-[22px] font-semibold capitalize transition duration-300 ease-in-out hover:text-white`}
+												title={`delete`}
+											>
+												<i class={`uil uil-trash-alt`}></i>
+											</button>
+										</div>
+									</div>
+
+									
+								{/each}
+							</div>
+						</div>
+					</div>
 				</div>
-			 </div>
-
-
-			<div class="interventions-container">
-				<h3>Lignes d'intervention</h3>
-				<button type="button" class="add-btn" on:click={ajouterIntervention}>
-					+ Ajouter une intervention
-				</button>
-				{#each mission.interventions as intervention, index (intervention.id)}
-					<div class="grid grid-cols-12 items-end gap-3">
-						<!-- Durée - 3 colonnes -->
-						<div class="col-span-3">
-							<InputSimple
-								type="text"
-								fieldName="duree"
-								label="Durée"
-								bind:field={intervention.duree}
-								placeholder="Heures"
-							/>
-						</div>
-
-						<!-- Description - 4 colonnes -->
-						<div class="col-span-4">
-							<InputSimple
-								type="text"
-								fieldName="description"
-								label="Description"
-								bind:field={intervention.description}
-								placeholder="Description de l'intervention"
-							/>
-						</div>
-
-						<!-- Technicien - 3 colonnes -->
-						<div class="col-span-3">
-							<InputSimple
-								type="text"
-								fieldName="technicien"
-								label="Technicien"
-								bind:field={intervention.technicien}
-								placeholder="Nom du technicien"
-							/>
-						</div>
-
-						<!-- Prix - 1 colonne -->
-						<div class="col-span-1">
-							<InputSimple
-								type="text"
-								fieldName="prix"
-								label="Prix (€)"
-								bind:field={intervention.prix}
-								placeholder="0.00"
-							/>
-						</div>
-
-						<!-- Bouton suppression - 1 colonne -->
-						<div class="col-span-1 flex h-[42px] items-center justify-center">
-							<button
-								type="button"
-								class="rounded-full p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-800"
-								on:click={() => supprimerIntervention(intervention.id)}
-								aria-label="Supprimer cette intervention"
-								title="Supprimer"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<path
-										fill-rule="evenodd"
-										d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-										clip-rule="evenodd"
-									/>
-								</svg>
-							</button>
-						</div>
-					</div>
-
-					<div class="intervention-card">
-						<div class="card-header">
-							<span>Intervention #{index + 1}</span>
-							<button
-								type="button"
-								class="delete-btn"
-								on:click={() => supprimerIntervention(intervention.id)}
-								aria-label="Supprimer cette intervention"
-							>
-								×
-							</button>
-						</div>
-					</div>
-				{/each}
 			</div>
 		</form>
 	</div>

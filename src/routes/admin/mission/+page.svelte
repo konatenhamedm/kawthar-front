@@ -11,13 +11,13 @@
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../store';
 	import { get } from 'svelte/store';
-	import type { User } from '../../../types';
+	import type { Mission, User } from '../../../types';
 	import Add from './Add.svelte';
 	import Show from './Show.svelte';
 	import Delete from './Delete.svelte';
 	import Menu from '$components/_includes/Menu.svelte';
 
-	let main_data: User[] = [];
+	let main_data: Mission[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -30,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/auth/agent/all');
+			const res = await apiFetch(true, '/missions');
 			if (res) {
-				main_data = res.data as User[];
+				main_data = res.data as Mission[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -50,10 +50,11 @@
 
 	$: filteredData = main_data.filter((item) => {
 		return (
-			item.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			item.libelle.toLowerCase().includes(searchQuery.toLowerCase()) 
+			/* ||
 			item.prenoms.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			item.tel.toLowerCase().includes(searchQuery.toLowerCase())
+			item.tel.toLowerCase().includes(searchQuery.toLowerCase()) */
 		);
 	});
 
@@ -136,9 +137,9 @@
 				class=" text-dark dark:text-title-dark border-regular dark:border-box-dark-up flex flex-wrap items-center justify-between border-b px-[25px] text-[17px] font-medium max-sm:h-auto max-sm:flex-col"
 			>
 				<h1
-					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap capitalize"
+					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
 				>
-					Liste des etudiants
+					Liste des missons
 				</h1>
 
 				<button
@@ -188,7 +189,7 @@
 									</div>
 								</th>
 
-								{#each ['Nom', 'Prénoms', 'Télephone', 'email'] as title}
+								{#each ['Libelle', 'Date début', 'Date fin', 'Entreprise','Type mission'] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -252,7 +253,7 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
 										>
-											{item.nom}</td
+											{item.libelle}</td
 										>
 										<!-- <td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase group-hover:bg-transparent last:text-end"
@@ -262,17 +263,22 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.prenoms}</td
+											{item.date_debut}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.tel}</td
+											{item.date_fin}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.email}</td
+											{item.entreprise_id}</td
+										>
+										<td
+											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
+										>
+											{item.type_mission_id}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
@@ -302,15 +308,15 @@
 	</div>
 </div>
 
-<Modale bind:open={openAdd} size="xl" title="Créer un utilisateur">
+<Modale bind:open={openAdd} size="2xl" title="Créer une mission">
 	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un utilisateur">
+<Modale bind:open={openEdit} size="2xl" title="Modifier une mission">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openShow} size="xl" title="Détails d'un utilisateur">
+<Modale bind:open={openShow} size="2xl" title="Détails de la mission">
 	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un utilisateur">
+<Modale bind:open={openDelete} size="xl" title="Supprimer une mission">
 	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
 </Modale>

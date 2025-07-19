@@ -34,6 +34,11 @@
       path: `${BASE_PATH}/users`
     },
     {
+      title: "Entreprises",
+      icon: "uil uil-store",
+      path: `${BASE_PATH}/entreprise`
+    },
+    {
       isSectionTitle: true,
       title: "Gestion Missions"
     },

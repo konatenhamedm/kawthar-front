@@ -11,7 +11,7 @@
 	// export let requis: boolean = false; // Si nécessaire, décommentez et utilisez correctement
 </script>
 
-<div class="mb-2">
+<div class="mb-2 ">
 	<label
 		for="email"
 		class="dark:text-title-dark mb-2 block text-sm font-medium text-gray-900 capitalize"

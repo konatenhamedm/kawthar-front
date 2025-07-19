@@ -26,6 +26,7 @@
 	};
 
 	export let data: Record<string, string> = {};
+		function init(form: HTMLFormElement) {}
 
 	async function getData() {
     try {
@@ -38,7 +39,7 @@
     }
   }
 
-	function init(form: HTMLFormElement) {}
+	
 	onMount(async () => {
    await getData();
   });
