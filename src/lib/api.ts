@@ -21,7 +21,7 @@ export async function apiFetch(
 
   // Définition des headers avec typage correct
   const headers: Record<string, string> = {
-    ...(method !== "GET" ? { "Content-Type": "application/json" } : {}),
+    ...(method !== "GET" ? { "Content-Type": "application/json","Accept": "application/json" } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
 

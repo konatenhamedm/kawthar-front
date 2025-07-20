@@ -1,10 +1,13 @@
 <script lang="ts">
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { BASE_URL_API } from '$lib/api';
+	import { apiFetch, BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
+	import InputDateSimple from '$components/inputs/InputDateSimple.svelte';
+	import InputTextArea from '$components/inputs/InputTextArea.svelte';
+	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
@@ -12,16 +15,28 @@
 	let showNotification = false;
 	let notificationMessage = '';
 	let notificationType = 'info';
-
+	let equipes: any = [];
+	let entreprises: any = [];
+	let natures: any = [];
+	let etats: any = [];
+	let types: any = [];
 	// Initializing the user object with only email and status
 
-	interface Intervention {
-		id: any;
+	interface LigneInventaire {
 		idF: any;
+		id: any;
+		libelle: string;
+		ref_article: string;
 		description: string;
-		technicien: string;
-		duree: string;
-		prix: number; // Changé en number
+		agent_create_id: any;
+		entreprise_id: any;
+		emplacement_id: any;
+		nature_id: any;
+		etat_id: any;
+		date_acquisition: string;
+		date_mise_en_service: string;
+		cout_acquisition: any;
+		image_url: string;
 	}
 
 	interface Mission {
@@ -32,72 +47,92 @@
 		adresse_mission: any;
 		date_fin: string;
 		type_mission_id: string;
-		interventions: Intervention[];
+		inventaires: LigneInventaire[];
 	}
 
 	// Initialisation des données avec les types
 	let mission: Mission = {
-		titre: '',
+		libelle: '',
 		date_debut: '',
+		entreprise_id: '',
+		description: '',
+		adresse_mission: '',
 		date_fin: '',
-		interventions: [
-			/* {
-				id: '1',
-				idF: '1',
-				description: 'string',
-				technicien: 'string',
-				duree: 'string',
-				prix: 25000 // Changé en number
-			},
-			{
-				id: '2',
-				idF: '2',
-				description: 'djkhddjkhd',
-				technicien: 'KONATE',
-				duree: '2 jour',
-				prix: 25000 // Changé en number
-			} */
-		]
+		type_mission_id: '',
+		inventaires: []
 	};
+
+	function formatDate(dateString: string): string {
+		return new Date(dateString).toISOString().split('T')[0];
+	}
+	function formatLignesInventaire(source = []) {
+		return source.map((item:LigneInventaire) => ({
+			id: item.id,
+			idF: item.id, // ou un autre identifiant si différent
+			libelle: item.libelle,
+			ref_article: item.ref_article,
+			description: item.description,
+			agent_create_id: item.agent_create_id,
+			entreprise_id: item.entreprise_id,
+			emplacement_id: item.emplacement_id,
+			nature_id: item.nature_id,
+			etat_id: item.etat_id,
+			date_acquisition: formatDate(item.date_acquisition),
+			date_mise_en_service: formatDate(item.date_mise_en_service),
+			cout_acquisition: item.cout_acquisition,
+			image_url: item.image_url
+		}));
+	}
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
-		((user.nom = data?.nom),
-			(user.prenoms = data?.prenoms),
-			(user.tel = data?.tel),
-			(user.email = data?.email),
-			(user.d_type = data?.d_type));
+		((mission.libelle = data?.libelle),
+			(mission.date_debut = data?.date_debut),
+			(mission.entreprise_id = data?.entrepriseMagasin != null ? data?.entrepriseMagasin.id : null),
+			(mission.type_mission_id = data?.typeMission != null ? data?.typeMission.id : null),
+			(mission.description = data?.description),
+			(mission.date_fin = data?.date_fin),
+			(mission.adresse_mission = data?.adresse_mission),
+			(mission.inventaires = formatLignesInventaire(data?.inventaires)));
 	}
 
-	async function SaveFunction() {
-		//isLoad = true;
+	async function getData() {
 		try {
-			const res = await fetch(BASE_URL_API + '/auth/upfate/' + data?.id, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: user.email,
-					tel: user.tel,
-					login: user.login,
-					nom: user.nom,
-					prenoms: user.prenoms,
-					d_type: user.d_type,
-					fcm_token: ''
-				})
-			});
-			console.log('content res', res);
+			const res = await apiFetch(true, '/parameters');
+			const data = res.data;
 
-			if (res.ok) {
+			equipes = data.equipes;
+			entreprises = data.entreprises;
+			types = data.type_missions;
+			console.log('', entreprises);
+		} catch (error) {
+			console.error('Error fetching villes:', error);
+		}
+	}
+
+	onMount(async () => {
+		await getData();
+	});
+
+	async function SaveFunction() {
+		isLoad = true;
+		try {
+			const res = await apiFetch(true, '/missions/create', 'POST', {
+				mission_id: data?.id,
+				lignes: mission.inventaires
+			});
+
+			console.log(res);
+
+			if (res) {
 				isLoad = false;
 				open = false;
 				notificationMessage = 'Utilisateur modifié avec succès!';
 				notificationType = 'success';
 				showNotification = true;
-			} else if (res.status === 400) {
-				notificationMessage = 'Utilisateur déjà inscrit';
+			} else {
+				notificationMessage = res.message;
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -121,49 +156,96 @@
 
 	// Ajouter une nouvelle ligne d'intervention
 	function ajouterIntervention(): void {
-		mission.interventions = [
-			...mission.interventions,
+		mission.inventaires = [
+			...mission.inventaires,
 			{
-				id: null,
 				idF: Date.now(),
-				description: '',
-				technicien: '',
-				duree: '',
-				prix: 0 // Initialisé à 0 plutôt que '0'
+				id: '',
+				
+				libelle: '',
+				ref_article: '',
+				etat_id: '',
+				entreprise_id: '',
+				
+				agent_create_id: '',
+				
+				emplacement_id: '',
+				nature_id: '',
+				cout_acquisition: '',
+				date_acquisition: '',
+
+				date_mise_en_service: '',
+				image_url: '',
+				description: ''
 			}
 		];
 	}
 
+	
+
 	// Supprimer une ligne d'intervention
-	function supprimerIntervention(id: number): void {
-		mission.interventions = mission.interventions.filter((i) => i.id !== id);
+	async function supprimerIntervention(id: number) {
+		//alert(id)
+
+		mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
 	}
 </script>
 
 <!-- Modal Content Wrapper -->
-<div class="space-y-4 rounded-lg bg-white p-2 ">
+<div class="space-y-4 rounded-lg bg-white p-2">
 	<!-- Card Body -->
 
-	
 	<div class="space-y-6">
 		<form action="#" use:init>
 			<!-- Champ Email -->
-			<div class="grid grid-cols-2 gap-3">
+			<!-- libelle: string; date_debut: string; date_fin: string; entreprise_id: string; type_mission_id:
+			string; adresse_mission: any; description: any; -->
+
+			<div class="grid grid-cols-3 gap-3">
 				<InputSimple
 					type="text"
-					fieldName="nom"
-					label="Nom"
-					bind:field={user.nom}
-					placeholder="Entrez le nom"
+					fieldName="libelle"
+					label="Libellé"
+					bind:field={mission.libelle}
+					placeholder="Entrez le libelle"
 				/>
-				<InputSimple
-					type="text"
-					fieldName="prenoms"
-					label="Prénoms"
-					bind:field={user.prenoms}
-					placeholder="Entrez les prénoms"
+
+				<InputDateSimple
+					fieldName="date_debut"
+					label="Date début"
+					bind:field={mission.date_debut}
+					placeholder="Date debut"
+				/>
+				<InputDateSimple
+					fieldName="date_fin"
+					label="Date fin"
+					bind:field={mission.date_fin}
+					placeholder="Date fin"
 				/>
 			</div>
+			<div class="grid grid-cols-3 gap-3">
+				<InputSelect
+					label="Entreprise"
+					bind:selectedId={mission.entreprise_id}
+					datas={entreprises}
+					id="entreprise_id"
+				/>
+
+				<InputSelect
+					label="Type mission"
+					bind:selectedId={mission.type_mission_id}
+					datas={types}
+					id="type_mission_id"
+				/>
+				<InputSimple
+					type="text"
+					fieldName="adresse_mission"
+					label="Addresse mission"
+					bind:field={mission.adresse_mission}
+					placeholder="Entrez l'addresse"
+				/>
+			</div>
+		
 			<div class="shadow-gray col-span-12 shadow">
 				<div
 					class="bg-blue dark:bg-box-dark text-body dark:text-subtitle-dark rounded-10 m-0 p-0 text-[15px]"
@@ -172,8 +254,8 @@
 						style="background-color:rgb(254 162 3)"
 						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
 					>
-						<h4 class="text-white dark:text-title-dark mb-0 text-lg font-medium">
-							Liste des interventions
+						<h4 class="dark:text-title-dark mb-0 text-lg font-medium text-white">
+							Liste des inventaires
 						</h4>
 
 						<button
@@ -186,70 +268,118 @@
 							<i class="uil uil-plus text-[18px]"></i>
 						</button>
 					</div>
-					<div class="flex items-center gap-[15px] p-[20px]">
+					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
 						<div
 							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
 						>
 							<div>
-								{#each mission.interventions as intervention, index (intervention.idF)}
-									<div class="grid grid-cols-12 items-end gap-3 border-b-2  border-black">
-										<!-- Durée - 3 colonnes -->
-										<div class="col-span-3">
-											<InputSimple
-												type="text"
-												fieldName="duree"
-												label="Durée"
-												bind:field={intervention.duree}
-												placeholder="Heures"
-											/>
-										</div>
+								{#each mission.inventaires as item, index (item.idF)}
 
-										<!-- Description - 4 colonnes -->
-										<div class="col-span-4">
-											<InputSimple
-												type="text"
-												fieldName="description"
-												label="Description"
-												bind:field={intervention.description}
-												placeholder="Description de l'intervention"
-											/>
-										</div>
+								<div
+								class="block rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white">
+								<div
+								  class="border-b-2 border-neutral-100 px-6 py-3 dark:border-white/10 flex flex-wrap items-center justify-between ">
+								  <h2>
+									Agent konate (équipe 7 )
+								  </h2>
 
-										<!-- Technicien - 3 colonnes -->
-										<div class="col-span-3">
-											<InputSimple
-												type="text"
-												fieldName="technicien"
-												label="Technicien"
-												bind:field={intervention.technicien}
-												placeholder="Nom du technicien"
-											/>
-										</div>
-
-										<!-- Prix - 1 colonne -->
-										<div class="col-span-1">
-											<InputSimple
-												type="text"
-												fieldName="prix"
-												label="Prix (€)"
-												bind:field={intervention.prix}
-												placeholder="0.00"
-											/>
-										</div>
-
-										<!-- Bouton suppression - 1 colonne -->
-										<div class="col-span-1 flex h-[42px] items-center justify-center">
-											<button style="margin-top: -21px;"
-												on:click={() => supprimerIntervention(intervention.idF)}
-												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] text-white leading-[22px] font-semibold capitalize transition duration-300 ease-in-out hover:text-white`}
+								  <button
+												
+												on:click={() => supprimerIntervention(item.idF)}
+												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold text-white capitalize transition duration-300 ease-in-out hover:text-white`}
 												title={`delete`}
 											>
 												<i class={`uil uil-trash-alt`}></i>
 											</button>
-										</div>
+								</div>
+								<div class="p-3">
+									<div class="grid grid-cols-4 gap-3 mb-3">
+										<InputSimple
+											type="text"
+											fieldName="libelle"
+											label="Libellé"
+											bind:field={mission.libelle}
+											placeholder="Entrez le libelle"
+										/>
+						
+										<InputDateSimple
+											fieldName="date_debut"
+											label="Date début"
+											bind:field={mission.date_debut}
+											placeholder="Date debut"
+										/>
+										<InputDateSimple
+											fieldName="date_fin"
+											label="Date fin"
+											bind:field={mission.date_fin}
+											placeholder="Date fin"
+										/>
+										<InputDateSimple
+											fieldName="date_fin"
+											label="Date fin"
+											bind:field={mission.date_fin}
+											placeholder="Date fin"
+										/>
 									</div>
+									<div class="grid grid-cols-4 gap-3 mb-3">
+										<InputSimple
+											type="text"
+											fieldName="libelle"
+											label="Libellé"
+											bind:field={mission.libelle}
+											placeholder="Entrez le libelle"
+										/>
+						
+										<InputDateSimple
+											fieldName="date_debut"
+											label="Date début"
+											bind:field={mission.date_debut}
+											placeholder="Date debut"
+										/>
+										<InputDateSimple
+											fieldName="date_fin"
+											label="Date fin"
+											bind:field={mission.date_fin}
+											placeholder="Date fin"
+										/>
+										<InputDateSimple
+											fieldName="date_fin"
+											label="Date fin"
+											bind:field={mission.date_fin}
+											placeholder="Date fin"
+										/>
+									</div>
+									<div class="grid grid-cols-2 gap-3 mb-3">
+										<InputSimple
+											type="text"
+											fieldName="libelle"
+											label="Libellé"
+											bind:field={mission.libelle}
+											placeholder="Entrez le libelle"
+										/>
+						
+										<InputDateSimple
+											fieldName="date_debut"
+											label="Date début"
+											bind:field={mission.date_debut}
+											placeholder="Date debut"
+										/>
+										
+									</div>
+									<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
+										<InputTextArea
+											fieldName="description"
+											label="Description"
+											bind:field={mission.description}
+											placeholder="Entrez une description"
+										/>
+									</div>
+								</div>
+							  </div>
+							  <div class="h-2 border-b-2 border-black">
 
-									
+							  </div>
+
 								{/each}
 							</div>
 						</div>

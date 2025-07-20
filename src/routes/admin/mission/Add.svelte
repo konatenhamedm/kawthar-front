@@ -216,7 +216,7 @@
 						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
 					>
 						<h4 class="dark:text-title-dark mb-0 text-lg font-medium text-white">
-							Liste des interventions
+							Liste des lignes équipe
 						</h4>
 
 						<button
@@ -229,13 +229,13 @@
 							<i class="uil uil-plus text-[18px]"></i>
 						</button>
 					</div>
-					<div class="flex items-center gap-[15px] p-[20px]">
+					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
 						<div
 							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
 						>
 							<div>
 								{#each mission.ligneEquipes as ligne, index (ligne.idF)}
-									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black">
+									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black bg-white shadow rounded-md p-2">
 										
 		
 										<!-- Durée - 3 colonnes -->
@@ -290,6 +290,8 @@
 												<i class={`uil uil-trash-alt`}></i>
 											</button>
 										</div>
+									</div><div class="h-2 border-b-2 border-black">
+
 									</div>
 								{/each}
 							</div>

@@ -36,7 +36,7 @@ let userdata :any = [];
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(false , '/sites/update/'+data?.id, "PUT",{
+			const res = await apiFetch(true , '/sites/update/'+data?.id, "PUT",{
 					libelle: item.libelle
 					
 				});

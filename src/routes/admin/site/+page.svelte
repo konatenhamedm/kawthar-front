@@ -11,13 +11,13 @@
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../store';
 	import { get } from 'svelte/store';
-	import type { Equipe, User } from '../../../types';
+	import type { Parametre, User } from '../../../types';
 	import Add from './Add.svelte';
 	import Show from './Show.svelte';
 	import Delete from './Delete.svelte';
 	import Menu from '$components/_includes/Menu.svelte';
 
-	let main_data: Equipe[] = [];
+	let main_data: Parametre[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -32,7 +32,7 @@
 		try {
 			const res = await apiFetch(true, '/sites');
 			if (res) {
-				main_data = res.data as Equipe[];
+				main_data = res.data as Parametre[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -133,7 +133,7 @@
 				class=" text-dark dark:text-title-dark border-regular dark:border-box-dark-up flex flex-wrap items-center justify-between border-b px-[25px] text-[17px] font-medium max-sm:h-auto max-sm:flex-col"
 			>
 				<h1
-					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap capitalize"
+					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
 				>
 					Liste des sites
 				</h1>

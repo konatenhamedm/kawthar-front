@@ -30,12 +30,13 @@ export interface LigneEquipe {
 export interface Mission {
   libelle: string;
   date_debut: string;
-  entrepriseMagasin: Entreprise[];
+  entrepriseMagasin: Entreprise;
   description: any;
   adresse_mission: any;
   date_fin: string;
-  typeMission: Parametre[];
+  typeMission: TypeMission;
   ligneEquipes: LigneEquipe[];
+  inventaires: LigneEquipe[];
 }
 
 

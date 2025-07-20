@@ -21,39 +21,20 @@
 	// Initializing the user object with only email and status
 	let item: any = {
 		libelle: '',
-		description: '',
-		chef_equipe_id: '',
-		agents: '',
 	};
 
 	export let data: Record<string, string> = {};
-		function init(form: HTMLFormElement) {}
 
-	async function getData() {
-    try {
-      const res = await apiFetch(false,  "/auth/users/all");
-      const data =  res.data;
-	  
-      userdata = data;
-    } catch (error) {
-      console.error("Error fetching villes:", error);
-    }
-  }
 
+
+	function init(form: HTMLFormElement) {}
 	
-	onMount(async () => {
-   await getData();
-  });
 
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true,'/equipes/create','POST',{
-					libelle: item.libelle,
-                    description: item.description,
-                    chef_equipe_id:item.chef_equipe_id,
-                    agents:[],
-
+			const res = await apiFetch(true,'/natureImmobilisations/create','POST',{
+					libelle: item.libelle
 				});
 			
 			if (res) {
@@ -93,7 +74,7 @@
 	<div class="space-y-6">
 		<form action="#" use:init>
 			<!-- Champ Email -->
-			<div class="grid grid-cols-2 gap-3">
+			<div class="grid grid-cols-1 gap-3">
 				<InputSimple
 					type="text"
 					fieldName="libelle"
@@ -102,23 +83,9 @@
 					placeholder="Entrez le nom de l'équipe"
 				/>
 				
-			
-				<InputUserSelect
-                label="Chef équipe" 
-                bind:selectedId={item.chef_equipe_id}
-                datas={userdata}
-                id="chef_equipe_id"
-            />
 			</div>
             
-			<div class="grid grid-cols-1 gap-3">
-				
-				<InputTextArea fieldName="description"
-				label="Description"
-				bind:field={item.description}
-				placeholder="Entrez la description" />
 			
-			</div>
             
 		</form>
 	</div>

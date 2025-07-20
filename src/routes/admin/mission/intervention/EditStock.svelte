@@ -20,13 +20,18 @@
 	let types: any = [];
 	// Initializing the user object with only email and status
 
-	interface LigneEquipe {
-		id: any;
+	interface LigneInventaireSansDate {
+		id: number;
 		idF: any;
-		equipe_id: any;
-		date_fin_intervention: any;
-		date_debut_intervention: string;
+		libelle: string;
+		ref_article: string;
 		description: string;
+		agent_create_id: number;
+		entreprise_id: number;
+		missions_id: number;
+		site_id: number;
+		utilite_id: number;
+		image_url: string;
 	}
 
 	interface Mission {
@@ -37,7 +42,7 @@
 		adresse_mission: any;
 		date_fin: string;
 		type_mission_id: string;
-		ligneEquipes: LigneEquipe[];
+		inventaires: LigneInventaireSansDate[];
 	}
 
 	// Initialisation des données avec les types
@@ -49,20 +54,24 @@
 		adresse_mission: '',
 		date_fin: '',
 		type_mission_id: '',
-		ligneEquipes: []
+		inventaires: []
 	};
 
 	function formatDate(dateString: string): string {
 		return new Date(dateString).toISOString().split('T')[0];
 	}
-	function formatMissionEquipes(source = []) {
-		return source.map((item, index) => ({
-			id: item.id, // id d’origine
-			idF: item.id, // ou item.id si tu veux une copie exacte
-			date_debut_intervention: formatDate(item.date_debut_intervention),
-			date_fin_intervention: formatDate(item.date_fin_intervention),
+	function formatLignesInventaire(source = []) {
+		return source.map((item) => ({
+			id: item.id,
+			libelle: item.libelle,
+			ref_article: item.ref_article,
 			description: item.description,
-			equipe_id: item.equipe?.id ?? null // on garde seulement l’id
+			agent_create_id: item.agent_create_id,
+			entreprise_id: item.entreprise_id,
+			missions_id: item.missions_id,
+			site_id: item.site_id,
+			utilite_id: item.utilite_id,
+			image_url: item.image_url
 		}));
 	}
 
@@ -77,7 +86,7 @@
 			(mission.description = data?.description),
 			(mission.date_fin = data?.date_fin),
 			(mission.adresse_mission = data?.adresse_mission),
-			(mission.ligneEquipes = formatMissionEquipes(data?.mission_equipes)));
+			(mission.inventaires = formatLignesInventaire(data?.mission_equipes)));
 	}
 
 	async function getData() {
@@ -101,7 +110,7 @@
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true, '/missions/update/'+data?.id, 'PUT', {
+			const res = await apiFetch(true, '/missions/create', 'POST', {
 				libelle: mission.libelle,
 				date_debut: mission.date_debut,
 				entreprise_id: mission.entreprise_id,
@@ -112,7 +121,7 @@
 				ligneEquipes: mission.ligneEquipes
 			});
 
-			console.log(res)
+			console.log(res);
 
 			if (res) {
 				isLoad = false;
@@ -195,7 +204,6 @@
 	async function supprimerIntervention(id: number) {
 		//alert(id)
 
-
 		mission.ligneEquipes = mission.ligneEquipes.filter((i) => i.idF !== id);
 	}
 </script>
@@ -256,10 +264,10 @@
 			</div>
 			<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
 				<InputTextArea
-					fieldName="description"
-					label="Description"
+					fieldName="entreprise"
+					label="Entreprise"
 					bind:field={mission.description}
-					placeholder="Entrez une description"
+					placeholder="Entrez l'entreprise"
 				/>
 			</div>
 			<div class="shadow-gray col-span-12 shadow">
@@ -271,7 +279,7 @@
 						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
 					>
 						<h4 class="dark:text-title-dark mb-0 text-lg font-medium text-white">
-							Liste des lignes équipe
+							Liste des interventions
 						</h4>
 
 						<button
@@ -284,13 +292,13 @@
 							<i class="uil uil-plus text-[18px]"></i>
 						</button>
 					</div>
-					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
+					<div class="flex items-center gap-[15px] p-[20px]">
 						<div
 							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
 						>
 							<div>
 								{#each mission.ligneEquipes as ligne, index (ligne.idF)}
-									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black shadow bg-white  shadow rounded-md p-2">
+									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black">
 										<!-- Durée - 3 colonnes -->
 										<div class="col-span-3">
 											<InputSelect
@@ -343,8 +351,6 @@
 												<i class={`uil uil-trash-alt`}></i>
 											</button>
 										</div>
-									</div><div class="h-2 border-b-2 border-black">
-
 									</div>
 								{/each}
 							</div>

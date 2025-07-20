@@ -11,13 +11,13 @@
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../store';
 	import { get } from 'svelte/store';
-	import type { Equipe, Parametre, User } from '../../../types';
+	import type { Equipe, User } from '../../../types';
 	import Add from './Add.svelte';
 	import Show from './Show.svelte';
 	import Delete from './Delete.svelte';
 	import Menu from '$components/_includes/Menu.svelte';
 
-	let main_data: Parametre[] = [];
+	let main_data: Equipe[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -30,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/utilites');
+			const res = await apiFetch(true, '/natureImmobilisations');
 			if (res) {
-				main_data = res.data as Parametre[];
+				main_data = res.data as Equipe[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -123,7 +123,7 @@
 </script>
 
 <div class=" ssm:mt-[30px] mx-[30px] mt-[15px] mb-[30px] min-h-[calc(100vh-195px)]">
-	<Abercrome titre="utilites" parent="Dashbord" current="utilites" />
+	<Abercrome titre="natures" parent="Dashbord" current="natures" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
 		<div
@@ -135,7 +135,7 @@
 				<h1
 					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
 				>
-					Liste des utilites
+					Liste des natures
 				</h1>
 
 				<button
@@ -251,11 +251,6 @@
 										>
 											{item.libelle}</td
 										>
-										<!-- <td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase group-hover:bg-transparent last:text-end"
-										>
-											{item.nom}</td
-										> -->
 										
 										
 										<td
@@ -285,26 +280,17 @@
 		</div>
 	</div>
 </div>
-<!-- <Add bind:open={openAdd} data={current_data} sizeModal='md' on:added={fetchData}/> -->
-<!-- <Edit bind:open={openEdit} data={current_data} sizeModal='md' on:updated={fetchData}/> -->
-<!-- <Show bind:open={openShow} data={current_data} sizeModal='md'/>
-<Delete bind:open={openDelete} data={current_data}  on:deleted={fetchData}/> -->
 
-<Modale bind:open={openAdd} size="xl" title="Créer un utilite">
+
+<Modale bind:open={openAdd} size="xl" title="Créer un site">
 	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un utilite">
+<Modale bind:open={openEdit} size="xl" title="Modifier un site">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openShow} size="xl" title="Détails d'une utilite">
+<Modale bind:open={openShow} size="xl" title="Détails d'un site">
 	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un utilite">
+<Modale bind:open={openDelete} size="xl" title="Supprimer un site">
 	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
 </Modale>
-
-<!-- <Modal bind:open={openEdit} title="Gestion" on:close={fetchData} size={'lg'} >
-
-      <Edit item={current_data} close={fetchData}    />
-   
-  </Modal> -->

@@ -20,7 +20,7 @@
     async function confirmDelete() {
         isLoad = true;
         try {
-            const res = await apiFetch(true , '/sites/delete/' + data?.id,'DELETE');
+            const res = await apiFetch(true , '/natureImmobilisations/delete/' + data?.id,'DELETE');
             
             if (res) {
                 notificationMessage = 'Utilisateur supprimé avec succès!';

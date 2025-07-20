@@ -1,70 +1,57 @@
 <script lang="ts">
+
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { apiFetch, BASE_URL_API, BASE_URL_API_UPLOAD } from '$lib/api';
+	import { apiFetch, BASE_URL_API, BASE_URL_API_LOGIN, BASE_URL_API_UPLOAD } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
-	import type { User } from '../../../types';
 	import InputTextArea from '$components/inputs/InputTextArea.svelte';
 	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
-
+let userdata :any = [];
 	let showNotification = false;
 	let notificationMessage = '';
 	let notificationType = 'info';
 
-	let userdata : any = [];
-
-	// Initializing the user object with only email and status
+	// Initializing the item object with only email and status
 	let item: any = {
 		libelle: '',
-		description: '',
-		chef_equipe_id: '',
-		agents: '',
 	};
 
+	let itemdata : any = [];
+
+
 	export let data: Record<string, string> = {};
-		function init(form: HTMLFormElement) {}
 
-	async function getData() {
-    try {
-      const res = await apiFetch(false,  "/auth/users/all");
-      const data =  res.data;
-	  
-      userdata = data;
-    } catch (error) {
-      console.error("Error fetching villes:", error);
+	function init(form: HTMLFormElement) {
+
+        item.libelle = data?.libelle
     }
-  }
 
-	
-	onMount(async () => {
-   await getData();
-  });
+	onMount(() => {});
 
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true,'/equipes/create','POST',{
-					libelle: item.libelle,
-                    description: item.description,
-                    chef_equipe_id:item.chef_equipe_id,
-                    agents:[],
-
+			const res = await apiFetch(true , '/natureImmobilisations/update/'+data?.id, "PUT",{
+					libelle: item.libelle
+					
 				});
-			
+		
+			console.log('content res', res);
+
 			if (res) {
 				isLoad = false;
 				open = false;
-				notificationMessage = res.message;
+				notificationMessage = 'Utilisateur modifié avec succès!';
 				notificationType = 'success';
 				showNotification = true;
-			} else  {
+			} else {
 				
-				notificationMessage = 'Une erreur est ';
+				notificationMessage = res.message;
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -85,6 +72,20 @@
 			event.preventDefault();
 		}
 	}
+	async function getData() {
+    try {
+      const res = await apiFetch(true,  "/auth/users/all");
+      const data = await res.data;
+      userdata = data;
+    } catch (error) {
+      console.error("Error fetching villes:", error);
+    }
+  }
+
+	onMount(async () => {
+      await getData();
+  });
+
 </script>
 
 <!-- Modal Content Wrapper -->
@@ -93,7 +94,7 @@
 	<div class="space-y-6">
 		<form action="#" use:init>
 			<!-- Champ Email -->
-			<div class="grid grid-cols-2 gap-3">
+			<div class="grid grid-cols-1 gap-3">
 				<InputSimple
 					type="text"
 					fieldName="libelle"
@@ -102,21 +103,6 @@
 					placeholder="Entrez le nom de l'équipe"
 				/>
 				
-			
-				<InputUserSelect
-                label="Chef équipe" 
-                bind:selectedId={item.chef_equipe_id}
-                datas={userdata}
-                id="chef_equipe_id"
-            />
-			</div>
-            
-			<div class="grid grid-cols-1 gap-3">
-				
-				<InputTextArea fieldName="description"
-				label="Description"
-				bind:field={item.description}
-				placeholder="Entrez la description" />
 			
 			</div>
             

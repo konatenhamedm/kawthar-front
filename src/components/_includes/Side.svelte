@@ -26,6 +26,8 @@
         { title: "Sites", path: `${BASE_PATH}/site` },
         { title: "Etats", path: `${BASE_PATH}/etat` },
         { title: "Utilité", path: `${BASE_PATH}/utilite` },
+        { title: "Emplacement", path: `${BASE_PATH}/emplacement` },
+        { title: "Nature", path: `${BASE_PATH}/nature` },
       ]
     },
     {

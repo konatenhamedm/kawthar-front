@@ -273,12 +273,12 @@
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.entreprise_id}</td
+											{item.entrepriseMagasin ? item.entrepriseMagasin.libelle : '' }</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.type_mission_id}</td
+											{item.typeMission ? item.typeMission.libelle : ''}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"

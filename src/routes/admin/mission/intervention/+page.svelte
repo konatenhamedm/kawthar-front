@@ -6,15 +6,18 @@
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import Modale from '$components/Modales/Modale.svelte';
 	import { onMount } from 'svelte';
+	import Edit from './Edit.svelte';
 	import Abercrome from '$components/_includes/Abercrome.svelte';
 	import Pagination from '$components/Pagination.svelte';
 	import { pageSize } from '../../../../store';
 	import { get } from 'svelte/store';
-	import type { User } from '../../../../types';
-	import Edit from './Edit.svelte';
+	
 	import Menu from '$components/_includes/Menu.svelte';
+	import type { Mission } from '../../../../types';
+	import EditStock from './EditStock.svelte';
+	import MenuInventaire from '$components/_includes/MenuInventaire.svelte';
 
-	let main_data: User[] = [];
+	let main_data: Mission[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
@@ -27,9 +30,9 @@
 	async function fetchData() {
 		loading = true; // Active le spinner de chargement
 		try {
-			const res = await apiFetch(true, '/auth/agent/all');
+			const res = await apiFetch(true, '/missions');
 			if (res) {
-				main_data = res.data as User[];
+				main_data = res.data as Mission[];
 				console.log('Données récupérées avec succès:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
@@ -47,10 +50,11 @@
 
 	$: filteredData = main_data.filter((item) => {
 		return (
-			item.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			item.libelle.toLowerCase().includes(searchQuery.toLowerCase()) 
+			/* ||
 			item.prenoms.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			item.tel.toLowerCase().includes(searchQuery.toLowerCase())
+			item.tel.toLowerCase().includes(searchQuery.toLowerCase()) */
 		);
 	});
 
@@ -88,33 +92,29 @@
 	const handleAction = (action: any, item: any) => {
 		current_data = item;
 		if (action === 'view') {
-			openShow = false;
+			openShow = true;
 		} else if (action === 'edit') {
 			openEdit = true;
 		} else if (action === 'delete') {
-			openDelete = false;
+			openDelete = true;
 		}
 	};
 
 	const actions =[
-		/* {
-			action: 'view',
-			title: 'Voir',
-			icon: 'eye',
-			color: 'primary'
-		}, */
+		
 		{
 			action: 'edit',
 			title: 'Modifier',
-			icon: 'edit',
+			icon: 'book',
+			color: 'warning'
+		},
+		{
+			action: 'view',
+			title: 'Modifier',
+			icon: 'book',
 			color: 'warning'
 		}
-		/* ,{
-			action: 'delete',
-			title: 'Supprimer',
-			icon: 'trash-alt',
-			color: 'danger'
-		} */
+		
 	];
 
 	function handlePageChange(event: CustomEvent) {
@@ -123,7 +123,7 @@
 </script>
 
 <div class=" ssm:mt-[30px] mx-[30px] mt-[15px] mb-[30px] min-h-[calc(100vh-195px)]">
-	<Abercrome titre="Mission" parent="Dashbord" current="Intervention" />
+	<Abercrome titre="User" parent="Dashbord" current="sss" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
 		<div
@@ -133,9 +133,9 @@
 				class=" text-dark dark:text-title-dark border-regular dark:border-box-dark-up flex flex-wrap items-center justify-between border-b px-[25px] text-[17px] font-medium max-sm:h-auto max-sm:flex-col"
 			>
 				<h1
-					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap capitalize"
+					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
 				>
-					Liste des etudiants
+					Liste des missons
 				</h1>
 
 				
@@ -176,7 +176,7 @@
 									</div>
 								</th>
 
-								{#each ['Nom', 'Prénoms', 'Télephone', 'email'] as title}
+								{#each ['Libelle', 'Date début', 'Date fin', 'Entreprise','Type mission'] as title}
 									<th
 										scope="col"
 										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
@@ -185,7 +185,7 @@
 									>
 								{/each}
 
-								<th
+								<th style="width: 10px;"
 									scope="col"
 									class="dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] border-none bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase before:hidden"
 								>
@@ -240,29 +240,39 @@
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
 										>
+											{item.libelle}</td
+										>
+										<!-- <td
+											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase group-hover:bg-transparent last:text-end"
+										>
 											{item.nom}</td
-										>
-									
+										> -->
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.prenoms}</td
+											{item.date_debut}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.tel}</td
+											{item.date_fin}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
 										>
-											{item.email}</td
+											{item.entrepriseMagasin ? item.entrepriseMagasin.libelle : '' }</td
+										>
+										<td
+											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
+										>
+											{item.typeMission ? item.typeMission.libelle : ''}</td
 										>
 										<td
 											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
 										>
-                                        <Menu item={item} onAction={handleAction}  actions={actions}/>
-											
+
+                                        <MenuInventaire item={item} onAction={handleAction} {actions} type={item.typeMission?.code} />
+										
 										</td>
 									</tr>
 								{/each}
@@ -287,7 +297,10 @@
 </div>
 
 
-<Modale bind:open={openEdit} size="full" title="Modifier un utilisateur">
+<Modale bind:open={openEdit} size="full" title="Inventaires">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
+</Modale>
+<Modale bind:open={openAdd} size="2xl" title="Inventaires">
+	<EditStock bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
 
