@@ -63,7 +63,7 @@
           <div class="rounded-6 mt-[25px] shadow-regular dark:shadow-xl bg-white dark:bg-[#111726]">
              <div class="p-[25px] text-center border-b border-regular dark:border-white/[.05] top">
                 <!-- Heading for the login form -->
-                <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-title-dark">Connectez vous ici</h2>
+                <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-title-dark">Connectez-vous ici</h2>
              </div>
 
              <!-- Login form inputs and elements -->
