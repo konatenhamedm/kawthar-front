@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import InputTextArea from '$components/inputs/InputTextArea.svelte';
 	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
+	import InputMultiSelectUser from '$components/inputs/InputMultiSelectUser.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
@@ -21,6 +22,7 @@ let userdata :any = [];
 		libelle: '',
 		description: '',
 		chef_equipe_id: '',
+		agents: []
 	};
 
 	let itemdata : any = [];
@@ -32,22 +34,34 @@ let userdata :any = [];
 
         item.libelle = data?.libelle,
         item.description = data?.description,
-        item.chef_equipe_id = data?.chef_equipe_id
+        item.chef_equipe_id = data?.chefEquipe.id,
+		item.agents = data?.agents
     }
 
 	onMount(() => {});
 
+	interface Item {
+		id: any;
+		nom: any;
+		prenoms: any;
+	}
+	function agentIds(source:any) {
+		return  source.map((item: Item) => item.id);
+		
+	}
+
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(false , '/equipes/update/'+data?.id, "PUT",{
+			const res = await apiFetch(true , '/equipes/update/'+data?.id, "PUT",{
 					libelle: item.libelle,
                     description: item.description,
                     chef_equipe_id:item.chef_equipe_id,
+					agents: agentIds(item.agents)
 					
 				});
 		
-			console.log('content res', res);
+			
 
 			if (res) {
 				isLoad = false;
@@ -80,7 +94,7 @@ let userdata :any = [];
 	}
 	async function getData() {
     try {
-      const res = await apiFetch(true,  "/auth/users/all");
+      const res = await apiFetch(false,  "/auth/users/all");
       const data = await res.data;
       userdata = data;
     } catch (error) {
@@ -116,6 +130,10 @@ let userdata :any = [];
                 datas={userdata}
                 id="chef_equipe_id"
             />
+			</div>
+
+			<div class="grid grid-cols-1 gap-3">
+				<InputMultiSelectUser options={userdata} bind:selected={item.agents} />
 			</div>
             
 			<div class="grid grid-cols-1 gap-3">

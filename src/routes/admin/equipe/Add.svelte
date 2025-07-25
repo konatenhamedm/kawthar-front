@@ -8,6 +8,8 @@
 	import type { User } from '../../../types';
 	import InputTextArea from '$components/inputs/InputTextArea.svelte';
 	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
+	import InputMultiSelect from '$components/inputs/InputMultiSelect.svelte';
+	import InputMultiSelectUser from '$components/inputs/InputMultiSelectUser.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
@@ -16,54 +18,62 @@
 	let notificationMessage = '';
 	let notificationType = 'info';
 
-	let userdata : any = [];
+	let userdata: any = [];
 
 	// Initializing the user object with only email and status
 	let item: any = {
 		libelle: '',
 		description: '',
 		chef_equipe_id: '',
-		agents: '',
+		agents: []
 	};
 
 	export let data: Record<string, string> = {};
-		function init(form: HTMLFormElement) {}
+	function init(form: HTMLFormElement) {}
 
 	async function getData() {
-    try {
-      const res = await apiFetch(false,  "/auth/users/all");
-      const data =  res.data;
-	  
-      userdata = data;
-    } catch (error) {
-      console.error("Error fetching villes:", error);
-    }
-  }
+		try {
+			const res = await apiFetch(true, '/auth/users/all');
+			const data = res.data;
 
-	
+			userdata = data;
+		} catch (error) {
+			console.error('Error fetching villes:', error);
+		}
+	}
+
 	onMount(async () => {
-   await getData();
-  });
+		await getData();
+	});
 
+	interface Item {
+		id: any;
+		nom: any;
+		prenoms: any;
+	}
+	function agentIds(source:any) {
+		return  source.map((item: Item) => item.id);
+		
+	}
 	async function SaveFunction() {
+
+		console.log(agentIds(item.agents))
 		isLoad = true;
 		try {
-			const res = await apiFetch(true,'/equipes/create','POST',{
-					libelle: item.libelle,
-                    description: item.description,
-                    chef_equipe_id:item.chef_equipe_id,
-                    agents:[],
+			const res = await apiFetch(true, '/equipes/create', 'POST', {
+				libelle: item.libelle,
+				description: item.description,
+				chef_equipe_id: item.chef_equipe_id,
+				agents: agentIds(item.agents)
+			});
 
-				});
-			
 			if (res) {
 				isLoad = false;
 				open = false;
 				notificationMessage = res.message;
 				notificationType = 'success';
 				showNotification = true;
-			} else  {
-				
+			} else {
 				notificationMessage = 'Une erreur est ';
 				notificationType = 'error';
 				showNotification = true;
@@ -85,6 +95,8 @@
 			event.preventDefault();
 		}
 	}
+
+	let selected: any = [];
 </script>
 
 <!-- Modal Content Wrapper -->
@@ -101,25 +113,26 @@
 					bind:field={item.libelle}
 					placeholder="Entrez le nom de l'équipe"
 				/>
-				
-			
+
 				<InputUserSelect
-                label="Chef équipe" 
-                bind:selectedId={item.chef_equipe_id}
-                datas={userdata}
-                id="chef_equipe_id"
-            />
+					label="Chef équipe"
+					bind:selectedId={item.chef_equipe_id}
+					datas={userdata}
+					id="chef_equipe_id"
+				/>
 			</div>
-            
 			<div class="grid grid-cols-1 gap-3">
-				
-				<InputTextArea fieldName="description"
-				label="Description"
-				bind:field={item.description}
-				placeholder="Entrez la description" />
-			
+				<InputMultiSelectUser options={userdata} bind:selected={item.agents} />
 			</div>
-            
+
+			<div class="grid grid-cols-1 gap-3">
+				<InputTextArea
+					fieldName="description"
+					label="Description"
+					bind:field={item.description}
+					placeholder="Entrez la description"
+				/>
+			</div>
 		</form>
 	</div>
 

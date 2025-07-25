@@ -158,26 +158,21 @@
 		];
 	}
 
-	/* async function deleteFonction(mission:any,equipe:any) {
+	async function deleteFonction(mission:any,equipe:any) {
         isLoad = true;
         try {
-            const res = await apiFetch(true,'/missions/delete/equipe')
+            const res = await apiFetch(true,'/missions/delete/equipe','DELETE',{
+				mission_id:mission,
+				equipe_id:equipe
+
+			});
 			
-			
-			
-			fetch(BASE_URL_API + '/auth/delete/' + data?.id, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (res.ok) {
+            if (res) {
                 notificationMessage = 'Utilisateur supprimé avec succès!';
                 notificationType = 'success';
                 open = false;
             } else {
-                notificationMessage = 'Erreur lors de la suppression';
+                notificationMessage = res.data.message;
                 notificationType = 'error';
             }
             showNotification = true;
@@ -189,13 +184,12 @@
         } finally {
             isLoad = false;
         }
-    } */
+    }
 
 	// Supprimer une ligne d'intervention
 	async function supprimerIntervention(id: number) {
-		//alert(id)
-
-
+		await deleteFonction(data?.id,id);
+		
 		mission.ligneEquipes = mission.ligneEquipes.filter((i) => i.idF !== id);
 	}
 </script>

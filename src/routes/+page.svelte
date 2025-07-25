@@ -25,7 +25,7 @@
       try {
         const success = await login(username, password);
 
-        console.log(success);
+        console.log(success.data.token);
       
         if (success.data.token != null) {
           window.location.href = "/admin";

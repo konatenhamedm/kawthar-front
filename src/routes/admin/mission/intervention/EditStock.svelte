@@ -8,6 +8,11 @@
 	import InputDateSimple from '$components/inputs/InputDateSimple.svelte';
 	import InputTextArea from '$components/inputs/InputTextArea.svelte';
 	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
+	import InputMultiSelect from '$components/inputs/InputMultiSelect.svelte';
+	import AutreInputSimple from '$components/inputs/AutreInputSimple.svelte';
+	import type { MissionEdit } from '../../../../types';
+	import ImageInputNew from '$components/inputs/ImageInputNew.svelte';
+	import QrCode from '$components/inputs/QrCode.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
@@ -17,60 +22,111 @@
 	let notificationType = 'info';
 	let equipes: any = [];
 	let entreprises: any = [];
+	let natures: any = [];
+	let sites: any = [];
+	let utilites: any = [];
+	let userdata: any = [];
 	let types: any = [];
 	// Initializing the user object with only email and status
 
-	interface LigneInventaireSansDate {
-		id: number;
+	/* "id": 0,
+      "libelle": "string",
+      "ref_article": "string",
+      "description": "string",
+      "agent_create_id": 0,
+      "entreprise_id": 0,
+      "missions_id": 0,
+      "is_site_id": 0,
+      "is_utilite_id": 0,
+      "image_url": "string" */
+
+	interface LigneInventaireFormatee {
+		id: any;
+		idF: any;
+		libelle: string;
+		nom_agent: string;
+		ref_article: string;
+		description: string;
+		agent_create_id: any;
+		entreprise_id: any;
+		missions_id: any;
+		is_site_id: any;
+		is_utilite_id: any;
+		qr_bar_code: any;
+		image_url: any;
+	}
+	interface LigneInventaireFormat_ {
+		id: any;
 		idF: any;
 		libelle: string;
 		ref_article: string;
 		description: string;
-		agent_create_id: number;
-		entreprise_id: number;
-		missions_id: number;
-		site_id: number;
-		utilite_id: number;
-		image_url: string;
+		agent_create: any;
+		entreprise: any;
+		mission_id: any;
+		qr_bar_code: any;
+		site: any;
+		utilite: any;
+		image_url: any;
 	}
 
 	interface Mission {
+		id: any;
 		libelle: string;
 		date_debut: string;
-		entreprise_id: string;
-		description: any;
-		adresse_mission: any;
+		entreprise_id: string | null;
+		entrepriseMagasin: any[]; // → remplacez `any` par votre vrai type
+		ligneEquipes: any[]; // idem
+		typeMission: any[]; // idem
+		description: string;
+		mission_id: any;
+		adresse_mission: string;
 		date_fin: string;
-		type_mission_id: string;
-		inventaires: LigneInventaireSansDate[];
+		type_mission_id: string | null;
+		inventaires: LigneInventaireFormatee[];
 	}
 
-	// Initialisation des données avec les types
 	let mission: Mission = {
+		id: '',
 		libelle: '',
 		date_debut: '',
-		entreprise_id: '',
+		mission_id: '',
+		entreprise_id: null,
+		entrepriseMagasin: [],
+		ligneEquipes: [],
+		typeMission: [],
 		description: '',
 		adresse_mission: '',
 		date_fin: '',
-		type_mission_id: '',
+		type_mission_id: null,
 		inventaires: []
 	};
 
-	function formatDate(dateString: string): string {
-		return new Date(dateString).toISOString().split('T')[0];
+	function formatDate(value: any): string {
+		if (!value || typeof value !== 'string') return '';
+		const date = new Date(value);
+		if (isNaN(date.getTime())) return '';
+		return date.toISOString().split('T')[0];
 	}
+
+	/* 	function formatDate(dateString: string): string {
+		return new Date(dateString).toISOString().split('T')[0];
+	} */
+
 	function formatLignesInventaire(source = []) {
-		return source.map((item) => ({
+		return source.map((item: LigneInventaireFormat_) => ({
 			id: item.id,
+			idF: item.id, // ou un autre identifiant si différent
 			libelle: item.libelle,
 			ref_article: item.ref_article,
 			description: item.description,
-			agent_create_id: item.agent_create_id,
-			entreprise_id: item.entreprise_id,
-			missions_id: item.missions_id,
-			site_id: item.site_id,
-			utilite_id: item.utilite_id,
+			missions_id: data?.id,
+			nom_agent: item.agent_create.nom + ' ' + item.agent_create.prenoms,
+			agent_create_id: item.agent_create.id,
+			entreprise_id: item.entreprise.id,
+			is_site_id: item.site.id,
+			is_utilite_id: item.utilite.id,
+			qr_bar_code: item.qr_bar_code,
 			image_url: item.image_url
 		}));
 	}
@@ -78,7 +134,6 @@
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
-		console.log('LOLOLOLOO', data);
 		((mission.libelle = data?.libelle),
 			(mission.date_debut = data?.date_debut),
 			(mission.entreprise_id = data?.entrepriseMagasin != null ? data?.entrepriseMagasin.id : null),
@@ -86,7 +141,7 @@
 			(mission.description = data?.description),
 			(mission.date_fin = data?.date_fin),
 			(mission.adresse_mission = data?.adresse_mission),
-			(mission.inventaires = formatLignesInventaire(data?.mission_equipes)));
+			(mission.inventaires = formatLignesInventaire(data?.inventaires)));
 	}
 
 	async function getData() {
@@ -97,7 +152,20 @@
 			equipes = data.equipes;
 			entreprises = data.entreprises;
 			types = data.type_missions;
+			sites = data.sites;
+			utilites = data.utilites;
 			console.log('', entreprises);
+		} catch (error) {
+			console.error('Error fetching villes:', error);
+		}
+	}
+
+	async function getDataUser() {
+		try {
+			const res = await apiFetch(false, '/auth/users/all');
+			const data = res.data;
+
+			userdata = data;
 		} catch (error) {
 			console.error('Error fetching villes:', error);
 		}
@@ -105,44 +173,75 @@
 
 	onMount(async () => {
 		await getData();
+		await getDataUser();
 	});
+
+	/* 	function formatDate(dateString: string | null | undefined): string {
+	if (!dateString) return '';
+	const date = new Date(dateString);
+	return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+} */
 
 	async function SaveFunction() {
 		isLoad = true;
+
 		try {
-			const res = await apiFetch(true, '/missions/create', 'POST', {
-				libelle: mission.libelle,
-				date_debut: mission.date_debut,
-				entreprise_id: mission.entreprise_id,
-				description: mission.description,
-				adresse_mission: mission.adresse_mission,
-				date_fin: mission.date_fin,
-				type_mission_id: mission.type_mission_id,
-				ligneEquipes: mission.ligneEquipes
+			const formData = new FormData();
+
+			// Champs mission principaux
+			formData.append('mission_id', data?.id ?? '');
+
+			// Champs des lignes d'inventaire
+			mission.inventaires.forEach((item: LigneInventaireFormatee, index) => {
+				formData.append(`lignes[${index}][id]`, item.id ?? '');
+				formData.append(`lignes[${index}][libelle]`, item.libelle ?? '');
+				formData.append(`lignes[${index}][ref_article]`, item.ref_article ?? '');
+				formData.append(`lignes[${index}][agent_create_id]`, item.agent_create_id ?? '');
+				formData.append(`lignes[${index}][description]`, item.description ?? '');
+				formData.append(`lignes[${index}][mission_id]`, data?.id ?? '');
+				formData.append(`lignes[${index}][entreprise_magasin_id]`, item.entreprise_id ?? '');
+				formData.append(`lignes[${index}][is_site_id]`, item.is_site_id ?? '');
+				formData.append(`lignes[${index}][is_utilite_id]`, item.is_utilite_id ?? '');
+				// Envoi du fichier image s'il existe
+				if (item.image_url instanceof File) {
+					formData.append(`lignes[${index}][image_url]`, item.image_url);
+				}
 			});
 
-			console.log(res);
+			for (const [key, value] of formData.entries()) {
+				console.log(`${key}:`, value);
+			}
+			// Appel API avec FormData
+			/* 		const res = await apiFetch(true, '/ligneInventaires/immo/multiple/create', 'POST', formData, {
+			headers: {
+				Accept: 'application/json'
+			}
+		}); */
 
-			if (res) {
+			const res = await fetch(BASE_URL_API + '/ligneInventaires/stock/multiple/create', {
+				method: 'POST',
+				headers: { Accept: 'application/json' },
+				body: formData
+			});
+
+			if (res.ok) {
 				isLoad = false;
 				open = false;
-				notificationMessage = 'Utilisateur modifié avec succès!';
+				notificationMessage = 'Mission enregistrée avec succès !';
 				notificationType = 'success';
 				showNotification = true;
 			} else {
-				notificationMessage = res.message;
+				isLoad = false;
+				notificationMessage = res.message || 'Erreur lors de l’enregistrement.';
 				notificationType = 'error';
 				showNotification = true;
 			}
 		} catch (error) {
 			isLoad = false;
-
-			// Afficher une notification d'erreur
-			notificationMessage = error?.message;
+			notificationMessage = error?.message ?? 'Erreur inconnue.';
 			notificationType = 'error';
 			showNotification = true;
-
-			console.error('Error saving:', error);
+			console.error('Erreur lors de la sauvegarde :', error);
 		}
 	}
 
@@ -154,57 +253,46 @@
 
 	// Ajouter une nouvelle ligne d'intervention
 	function ajouterIntervention(): void {
-		mission.ligneEquipes = [
-			...mission.ligneEquipes,
+		mission.inventaires = [
+			...mission.inventaires,
 			{
-				id: null,
 				idF: Date.now(),
-				description: '',
-				equipe_id: '',
-				date_debut_intervention: '',
-				date_fin_intervention: ''
+				id: '',
+				nom_agent: '',
+				libelle: '',
+				qr_bar_code: '',
+				ref_article: '',
+				is_site_id: '',
+				agent_create_id: '',
+				missions_id: mission.id,
+				entreprise_id: mission.entreprise_id,
+				is_utilite_id: '',
+				image_url: '',
+				description: ''
 			}
 		];
 	}
 
-	/* async function deleteFonction(mission:any,equipe:any) {
-        isLoad = true;
-        try {
-            const res = await apiFetch(true,'/missions/delete/equipe')
-			
-			
-			
-			fetch(BASE_URL_API + '/auth/delete/' + data?.id, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (res.ok) {
-                notificationMessage = 'Utilisateur supprimé avec succès!';
-                notificationType = 'success';
-                open = false;
-            } else {
-                notificationMessage = 'Erreur lors de la suppression';
-                notificationType = 'error';
-            }
-            showNotification = true;
-        } catch (error) {
-            notificationMessage = error?.message || 'Une erreur est survenue';
-            notificationType = 'error';
-            showNotification = true;
-            console.error("Error deleting:", error);
-        } finally {
-            isLoad = false;
-        }
-    } */
+	async function confirmDelete(id: any) {
+		try {
+			const res = await apiFetch(true, '/ligneInventaires/delete/' + id, 'DELETE');
+
+			return res;
+		} catch (error) {
+			console.error('Error deleting:', error);
+		} finally {
+		}
+	}
 
 	// Supprimer une ligne d'intervention
-	async function supprimerIntervention(id: number) {
-		//alert(id)
+	async function supprimerIntervention(id: number, idF: any) {
+		if (id == idF) {
+			const resultat = await confirmDelete(id);
 
-		mission.ligneEquipes = mission.ligneEquipes.filter((i) => i.idF !== id);
+			if (resultat) mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
+		} else {
+			mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
+		}
 	}
 </script>
 
@@ -219,6 +307,8 @@
 			string; adresse_mission: any; description: any; -->
 
 			<div class="grid grid-cols-3 gap-3">
+				<!-- <InputMultiSelect options={equipes} bind:selected />
+				<AutreInputSimple options={equipes} bind:selected={selected2}/> -->
 				<InputSimple
 					type="text"
 					fieldName="libelle"
@@ -262,14 +352,7 @@
 					placeholder="Entrez l'addresse"
 				/>
 			</div>
-			<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
-				<InputTextArea
-					fieldName="entreprise"
-					label="Entreprise"
-					bind:field={mission.description}
-					placeholder="Entrez l'entreprise"
-				/>
-			</div>
+
 			<div class="shadow-gray col-span-12 shadow">
 				<div
 					class="bg-blue dark:bg-box-dark text-body dark:text-subtitle-dark rounded-10 m-0 p-0 text-[15px]"
@@ -279,7 +362,7 @@
 						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
 					>
 						<h4 class="dark:text-title-dark mb-0 text-lg font-medium text-white">
-							Liste des interventions
+							Liste des inventaires
 						</h4>
 
 						<button
@@ -292,66 +375,87 @@
 							<i class="uil uil-plus text-[18px]"></i>
 						</button>
 					</div>
-					<div class="flex items-center gap-[15px] p-[20px]">
+					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
 						<div
 							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
 						>
 							<div>
-								{#each mission.ligneEquipes as ligne, index (ligne.idF)}
-									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black">
-										<!-- Durée - 3 colonnes -->
-										<div class="col-span-3">
-											<InputSelect
-												label="Equipe"
-												bind:selectedId={ligne.equipe_id}
-												datas={equipes}
-												id="equipe_id"
-											/>
-										</div>
+								{#each mission.inventaires as item, index (item.idF)}
+									<div
+										class="text-surface shadow-secondary-1 dark:bg-surface-dark block rounded-lg bg-white dark:text-white"
+									>
+										<div
+											class="flex flex-wrap items-center justify-between border-b-2 border-neutral-100 px-6 py-3 dark:border-white/10"
+										>
+											<h2>Agent <strong>({item.nom_agent})</strong></h2>
 
-										<!-- Description - 4 colonnes -->
-										<div class="col-span-3">
-											<InputDateSimple
-												fieldName="date_debut_intervention"
-												label="Date début"
-												bind:field={ligne.date_debut_intervention}
-												placeholder="Entrez la date début"
-											/>
-										</div>
-
-										<!-- Technicien - 3 colonnes -->
-										<div class="col-span-3">
-											<InputDateSimple
-												fieldName="date_fin_intervention"
-												label="Date fin"
-												bind:field={ligne.date_fin_intervention}
-												placeholder="Entrez la date fin"
-											/>
-										</div>
-
-										<!-- Prix - 1 colonne -->
-										<div class="col-span-2">
-											<InputSimple
-												type="text"
-												fieldName="description"
-												label="Description"
-												bind:field={ligne.description}
-												placeholder="Entrez un commentaire"
-											/>
-										</div>
-
-										<!-- Bouton suppression - 1 colonne -->
-										<div class="col-span-1 flex h-[42px] items-center justify-center">
 											<button
-												style="margin-top: -21px;"
-												on:click={() => supprimerIntervention(ligne.idF)}
+												on:click={() => supprimerIntervention(item.id, item.idF)}
 												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold text-white capitalize transition duration-300 ease-in-out hover:text-white`}
 												title={`delete`}
 											>
 												<i class={`uil uil-trash-alt`}></i>
 											</button>
 										</div>
+										<div class="p-3">
+											<QrCode text={item.qr_bar_code}/><br>
+											<div class="mb-3 grid grid-cols-3 gap-3">
+												<InputSimple
+													type="text"
+													fieldName="libelle"
+													label="Libellé"
+													bind:field={item.libelle}
+													placeholder="Entrez le libelle"
+												/>
+												<InputSimple
+													type="text"
+													fieldName="ref_article"
+													label="Ref article"
+													bind:field={item.ref_article}
+													placeholder="Entrez la ref article"
+												/>
+												<InputSelect
+													label="Site"
+													bind:selectedId={item.is_site_id}
+													datas={sites}
+													id="is_site_id"
+												/>
+											</div>
+											<div class="mb-3 grid grid-cols-3 gap-3">
+												<InputSelect
+													label="Utilité"
+													bind:selectedId={item.is_utilite_id}
+													datas={utilites}
+													id="is_utilite_id"
+												/>
+
+												<InputUserSelect
+													label="Agent"
+													bind:selectedId={item.agent_create_id}
+													datas={userdata}
+													id="agent_create_id"
+												/>
+												<ImageInputNew
+													label="Image"
+													fieldName="image_url"
+													bind:field={item.image_url}
+													placeholder="Sélectionnez une image"
+													showPreview={true}
+													link={item.image_url ? item.image_url : ''}
+												/>
+											</div>
+
+											<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
+												<InputTextArea
+													fieldName="description"
+													label="Description"
+													bind:field={item.description}
+													placeholder="Entrez une description"
+												/>
+											</div>
+										</div>
 									</div>
+									<div class="mb-[7px] h-2 border-b-2 border-black"></div>
 								{/each}
 							</div>
 						</div>

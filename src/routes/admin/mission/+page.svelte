@@ -169,128 +169,96 @@
 			</div>
 			<div class="p-[20px]">
 				<div class="scrollbar overflow-x-auto">
-					<table
-						class="table-border min-w-full border-b border-gray-300 text-start text-sm font-light"
-					>
-						<thead class="font-medium">
-							<tr class="bg-[#00baff]">
-								<th style="width: 2px;"
-									scope="col"
-									class="dark:bg-box-dark-up text-body-header dark:text-title-white rounded-s-[6px] border-none bg-[#f8f9fb] px-[25px] py-3.5 text-start text-[15px] font-medium capitalize before:hidden"
-								>
-									<div class="mb-[0.125rem] block min-h-[1.5rem]">
-										<input
-											class="border-normal checked:border-primary checked:bg-primary dark:border-dark-border dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary indeterminate:border-primary indeterminate:bg-primary relative me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] cursor-none appearance-none rounded-[0.25rem] border-1 border-solid outline-none before:pointer-events-none before:absolute before:h-[10px] before:w-[0.5px] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:content-[''] after:top-[2px] checked:before:opacity-[0.16] checked:after:absolute checked:after:ms-[5px] checked:after:mt-0 checked:after:block checked:after:h-[10px] checked:after:w-[5px] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-t-0 checked:after:border-l-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] indeterminate:after:absolute indeterminate:after:ms-[4px] indeterminate:after:mt-[5px] indeterminate:after:w-[0.5rem] indeterminate:after:border-[0.05rem] indeterminate:after:border-solid indeterminate:after:border-white hover:cursor-pointer hover:before:opacity-[0.04] indeterminate:focus:after:w-[0.5rem] indeterminate:focus:after:rounded-none indeterminate:focus:after:border-[0.125rem] indeterminate:focus:after:border-r-0 indeterminate:focus:after:border-b-0 indeterminate:focus:after:border-l-0 ltr:ltr:float-left rtl:float-right rtl:ltr:float-right"
-											type="checkbox"
-											id="checkAllExport"
-											value=""
-											aria-label="..."
-										/>
-									</div>
-								</th>
-
-								{#each ['Libelle', 'Date début', 'Date fin', 'Entreprise','Type mission'] as title}
-									<th
-										scope="col"
-										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
-									>
-										{title}</th
-									>
-								{/each}
-
-								<th
-									scope="col"
-									class="dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] border-none bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase before:hidden"
-								>
-									Action</th
-								>
-							</tr>
+					<table class="min-w-full border border-gray-300 border-collapse text-start text-sm font-light">
+						<thead class="font-medium text-white">
+						  <tr class="bg-[#00baff]">
+							<th style="width: 2px;"
+							  class="border border-gray-300 dark:bg-box-dark-up text-body-header dark:text-title-white rounded-s-[6px] bg-[#f8f9fb] px-[25px] py-3.5 text-start text-[15px] font-medium capitalize">
+							  <div class="mb-[0.125rem] block min-h-[1.5rem]">
+								<input
+								  class="relative me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border border-gray-300 checked:border-primary checked:bg-primary"
+								  type="checkbox"
+								  id="checkAllExport"
+								  value=""
+								  aria-label="..."
+								/>
+							  </div>
+							</th>
+					  
+							{#each ['Libelle', 'Date début', 'Date fin', 'Entreprise','Type mission'] as title}
+							  <th
+								scope="col" style="width: 200px; text-align: center;"
+								class="border border-gray-300 dark:bg-box-dark-up text-body-header text-title-white bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase">
+								{title}
+							  </th>
+							{/each}
+					  
+							<th
+							  scope="col"
+							  class="border border-gray-300 dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase">
+							  Action
+							</th>
+						  </tr>
 						</thead>
+					  
 						<tbody>
-							{#if loading && paginatedData.length === 0}
-								<tr>
-									<td colspan="6" class="py-4 text-center">
-										<!--  <div class="flex flex-row gap-2 items-center justify-center"> -->
-										<div class="grid w-full grid-cols-1">
-											<div
-												class="flex flex-col flex-wrap items-center justify-center gap-[15px] p-[25px] py-[16px]"
-											>
-												<div
-													class="text-primary inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-													role="status"
-												>
-													<span
-														class="!absolute !-m-px !h-px !w-px !overflow-hidden !border-0 !p-0 !whitespace-nowrap ![clip:rect(0,0,0,0)]"
-														>Loading...</span
-													>
-												</div>
-											</div>
-										</div>
-										<!-- </div> -->
-									</td>
-								</tr>
-							{:else if paginatedData.length === 0}
-								<tr>
-									<td colspan="6" class="py-4 text-center">
-										Aucun résultat trouvé avec les critères de filtrage actuels
-									</td>
-								</tr>
-							{:else}
-								{#each paginatedData as item, i}
-									<tr class="group">
-										<td
-											class="text-dark dark:text-title-dark text-15 w-[60px] rounded-s-[6px] border-none px-[25px] py-2.5 pt-[15px] text-start font-medium group-hover:bg-transparent before:hidden last:text-end"
-										>
-											<div class="mb-[0.125rem] block min-h-[1.5rem]">
-												<input
-													class="border-normal checked:border-primary checked:bg-primary dark:border-box-dark-up dark:checked:border-primary dark:checked:bg-primary checkboxItemExport relative me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-1 border-solid outline-none before:pointer-events-none before:absolute before:h-[10px] before:w-[0.5px] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:content-[''] after:top-[2px] checked:before:opacity-[0.16] checked:after:absolute checked:after:ms-[5px] checked:after:mt-0 checked:after:block checked:after:h-[10px] checked:after:w-[5px] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-t-0 checked:after:border-l-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] ltr:float-left rtl:float-right"
-													type="checkbox"
-													value=""
-													aria-label="..."
-												/>
-											</div>
-										</td>
-										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
-										>
-											{item.libelle}</td
-										>
-										<!-- <td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase group-hover:bg-transparent last:text-end"
-										>
-											{item.nom}</td
-										> -->
-										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.date_debut}</td
-										>
-										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.date_fin}</td
-										>
-										<td
-											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.entrepriseMagasin ? item.entrepriseMagasin.libelle : '' }</td
-										>
-										<td
-											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-end"
-										>
-											{item.typeMission ? item.typeMission.libelle : ''}</td
-										>
-										<td
-											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
-										>
-                                        <Menu item={item} onAction={handleAction} {actions} />
-										
-										</td>
-									</tr>
-								{/each}
-							{/if}
+						  {#if loading && paginatedData.length === 0}
+							<tr>
+							  <td colspan="7" class="border border-gray-300 py-4 text-center">
+								<div class="grid w-full grid-cols-1">
+								  <div class="flex flex-col flex-wrap items-center justify-center gap-[15px] p-[25px] py-[16px]">
+									<div
+									  class="text-primary inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-e-transparent dark:text-white"
+									  role="status">
+									  <span class="sr-only">Loading...</span>
+									</div>
+								  </div>
+								</div>
+							  </td>
+							</tr>
+						  {:else if paginatedData.length === 0}
+							<tr>
+							  <td colspan="7" class="border border-gray-300 py-4 text-center">
+								Aucun résultat trouvé avec les critères de filtrage actuels
+							  </td>
+							</tr>
+						  {:else}
+							{#each paginatedData as item, i}
+							  <tr class="group">
+								<td class="border border-gray-300 text-dark dark:text-title-dark w-[60px] rounded-s-[6px] px-[25px] py-2.5 text-start font-medium">
+								  <div class="mb-[0.125rem] block min-h-[1.5rem]">
+									<input
+									  class="checkboxItemExport relative me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border border-gray-300 checked:border-primary checked:bg-primary"
+									  type="checkbox"
+									  value=""
+									  aria-label="..."
+									/>
+								  </div>
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
+								  {item.libelle}
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
+								  {item.date_debut}
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
+								  {item.date_fin}
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
+								  {item.entrepriseMagasin ? item.entrepriseMagasin.libelle : ''}
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
+								  {item.typeMission ? item.typeMission.libelle : ''}
+								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end">
+								  <Menu item={item} onAction={handleAction} {actions} />
+								</td>
+							  </tr>
+							{/each}
+						  {/if}
 						</tbody>
-					</table>
+					  </table>
+					  
 					{#if filteredData.length > 0 && totalPages > 1}
 						<Pagination
 							{currentPage}

@@ -38,7 +38,19 @@ export interface Mission {
   ligneEquipes: LigneEquipe[];
   inventaires: LigneEquipe[];
 }
-
+export interface MissionEdit {
+  libelle: string;
+  date_debut: string;
+  entrepriseMagasin: Entreprise;
+  entreprise_id:any
+  description: any;
+  adresse_mission: any;
+  date_fin: string;
+  type_mission_id:any;
+  typeMission: TypeMission;
+  ligneEquipes: LigneEquipe[];
+  inventaires: LigneEquipe[];
+}
 
 export interface Equipe {
   id: number;
