@@ -84,7 +84,7 @@
 	}
 
 	// Rafraîchir les données après fermeture des modales
-	$: if (!openAdd || !openEdit || !openDelete) {
+	$: if (!openAdd || !openEdit || !openShow) {
 		refreshDataIfNeeded();
 	}
 

@@ -12,7 +12,7 @@ export let current: any = [];
             class="ssm:mb-[33px] mb-[18px] flex flex-wrap items-center justify-center gap-x-[15px] gap-y-[5px] leading-[1.8571428571] max-sm:flex-col sm:justify-between"
         >
             <!-- Title -->
-            <h4 class="text-dark dark:text-title-dark text-[20px] font-semibold capitalize">{titre}</h4>
+            <h4 class="text-dark dark:text-title-dark text-[20px] font-semibold ">{titre}</h4>
             <!-- Breadcrumb Navigation -->
             <div class="flex flex-wrap justify-center">
                 <nav>
