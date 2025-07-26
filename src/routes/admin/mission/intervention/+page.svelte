@@ -235,9 +235,11 @@
 								<td class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
 								  {item.typeMission ? item.typeMission.libelle : ''}
 								</td>
-								<td class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal capitalize text-end">
-								  <MenuInventaire item={item} onAction={handleAction} {actions} type={item.typeMission?.code} />
-								</td>
+								
+								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end" style="text-align: center;">
+									<MenuInventaire item={item} onAction={handleAction} {actions} type={item.typeMission?.code} />
+
+								  </td>
 							  </tr>
 							{/each}
 						  {/if}

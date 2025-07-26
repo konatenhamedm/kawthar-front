@@ -240,9 +240,9 @@
 								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">{item.tel}</td>
 								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap lowercase">{item.email}</td>
 								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">{item.d_type}</td>
-								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end">
-								  <Menu item={item} onAction={handleAction} {actions} />
-								</td>
+								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end" style="text-align: center;">
+									<Menu item={item} onAction={handleAction} {actions} />
+								  </td>
 							  </tr>
 							{/each}
 						  {/if}

@@ -193,7 +193,7 @@
 							  </th>
 							{/each}
 					  
-							<th
+							<th style="width: 8px;text-align: center;"
 							  scope="col"
 							  class="border border-gray-300 dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase">
 							  Action
@@ -250,7 +250,7 @@
 								<td class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
 								  {item.typeMission ? item.typeMission.libelle : ''}
 								</td>
-								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end">
+								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end" style="text-align: center;">
 								  <Menu item={item} onAction={handleAction} {actions} />
 								</td>
 							  </tr>

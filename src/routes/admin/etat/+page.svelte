@@ -165,9 +165,7 @@
 			</div>
 			<div class="p-[20px]">
 				<div class="scrollbar overflow-x-auto">
-					<table
-						class="table-border min-w-full border-b border-gray-300 text-start text-sm font-light"
-					>
+					<table class="min-w-full border border-gray-300 border-collapse text-start text-sm font-light">
 						<thead class="font-medium">
 							<tr class="bg-[#00baff]">
 								<th style="width: 2px;"
@@ -188,7 +186,7 @@
 								{#each ['Libelle'] as title}
 									<th
 										scope="col"
-										class="dark:bg-box-dark-up text-body-header white:text-title-white border-none bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase before:hidden"
+										class="border border-gray-300 dark:bg-box-dark-up text-body-header text-title-white bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase"
 									>
 										{title}</th
 									>
@@ -235,7 +233,7 @@
 								{#each paginatedData as item, i}
 									<tr class="group">
 										<td 
-											class="text-dark dark:text-title-dark text-15 w-[60px] rounded-s-[6px] border-none px-[25px] py-2.5 pt-[15px] text-start font-medium group-hover:bg-transparent before:hidden last:text-end"
+											class="border border-gray-300 text-dark dark:text-title-dark w-[60px] rounded-s-[6px] px-[25px] py-2.5 text-start font-medium"
 										>
 											<div class="mb-[0.125rem] block min-h-[1.5rem]">
 												<input
@@ -247,18 +245,15 @@
 											</div>
 										</td>
 										<td
-											class="text-dark dark:text-title-dark border-none px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize group-hover:bg-transparent last:text-start"
+											class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
 										>
 											{item.libelle}</td
 										>
 										
 										
-										<td
-											class="text-dark dark:text-title-dark rounded-e-[6px] border-none py-2.5 ps-4 pe-4 text-[14px] font-normal capitalize group-hover:bg-transparent last:text-end"
-										>
-                                        <Menu item={item} onAction={handleAction} {actions}/>
-											
-										</td>
+										<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end" style="text-align: center;">
+											<Menu item={item} onAction={handleAction} {actions} />
+										  </td>
 									</tr>
 								{/each}
 							{/if}
