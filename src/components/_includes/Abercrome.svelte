@@ -21,7 +21,7 @@ export let current: any = [];
                         <li class="inline-flex items-center">
                             <a
                                 class="text-body hover:text-primary group text-[14px] leading-[20px] font-normal dark:text-neutral-200"
-                                href="index.html"
+                                href="/admin"
                             >
                                 <i
                                     class="uil uil-estate text-light me-[8px] text-[16px] group-hover:text-current dark:text-white/50"

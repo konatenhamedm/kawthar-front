@@ -123,7 +123,7 @@
 </script>
 
 <div class=" ssm:mt-[30px] mx-[30px] mt-[15px] mb-[30px] min-h-[calc(100vh-195px)]">
-	<Abercrome titre="User" parent="Dashbord" current="sss" />
+	<Abercrome titre="Missions" parent="Dashbord" current="liste missions" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
 		<div
@@ -135,7 +135,7 @@
 				<h1
 					class="text-dark dark:text-title-dark mb-0 inline-flex items-center overflow-hidden py-[16px] text-[18px] font-semibold text-ellipsis whitespace-nowrap "
 				>
-					Liste des missons
+					Liste des missons pour inventaires
 				</h1>
 
 				
