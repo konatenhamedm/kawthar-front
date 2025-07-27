@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BASE_URL_API_UPLOAD } from './../../../../lib/api.ts';
+	
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { apiFetch, BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
@@ -33,6 +33,7 @@
 	interface LigneInventaireFormatee {
 		id: any;
 		idF: any;
+		nom_agent: string;
 		libelle: string;
 		ref_article: string;
 		description: string;
@@ -102,13 +103,14 @@
 			agent_create_id: item.agent_create.id,
 			entreprise_id: item.entreprise?.id,
 			emplacement_id: item.emplacement ? item.emplacement.id : null,
+			nom_agent: item.agent_create.nom + ' ' + item.agent_create.prenoms,
 			nature_id: item.nature ? item.nature.id : null,
 			etat_id: item.etat ? item.etat.id : null,
 			qr_bar_code: item.qr_bar_code,
 			date_acquisition: formatDate(item.date_acquisition),
 			date_mise_en_service: formatDate(item.date_mise_en_service),
 			cout_acquisition: item.cout_acquisition,
-			image_url: BASE_URL_API_UPLOAD + item.image_url
+			image_url: item.image_url
 		}));
 	}
 
@@ -248,6 +250,8 @@
 			{
 				idF: Date.now(),
 				id: '',
+		nom_agent: '',
+
 				qr_bar_code: '',
 				libelle: '',
 				ref_article: '',
@@ -386,7 +390,7 @@
 										<div
 											class="flex flex-wrap items-center justify-between border-b-2 border-neutral-100 px-6 py-3 dark:border-white/10"
 										>
-											<h2>Agent {item.agent_create_id} (équipe 7 )</h2>
+											<h2>Agent <strong>({item.nom_agent})</strong></h2>
 
 											<button
 												on:click={() => supprimerIntervention(item.id, item.idF)}
@@ -397,7 +401,7 @@
 											</button>
 										</div>
 										<div class="p-3">
-											<QrCode text={item.qr_bar_code}/><br>
+											<QrCode text={item.qr_bar_code} /><br />
 											<div class="mb-3 grid grid-cols-4 gap-3">
 												<InputSimple
 													type="text"
@@ -461,7 +465,7 @@
 													bind:field={item.date_mise_en_service}
 													placeholder="Entrez la date mise en oeuvre"
 												/>
-												<ImageInputNew 
+												<ImageInputNew
 													label="Image"
 													fieldName="image_url"
 													bind:field={item.image_url}
