@@ -15,7 +15,7 @@ export async function handle({event, resolve}) {
     }
   }
 
- /*  // Protéger la route /admin en vérifiant l'authentification
+  // Protéger la route /admin en vérifiant l'authentification
   if (event.url.pathname.startsWith ('/admin') && !user) {
     // Redirection si l'utilisateur n'est pas authentifié
     return redirect (302, '/');
@@ -23,7 +23,7 @@ export async function handle({event, resolve}) {
   if (event.url.pathname == '/' && !user) {
     // Redirection si l'utilisateur n'est pas authentifié
     return redirect (302, '/admin');
-  } */
+  }
 
   // Continuer la requête si tout va bien
   const response = await resolve (event);

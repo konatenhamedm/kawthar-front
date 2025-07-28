@@ -99,7 +99,7 @@
 <aside id="asideBar" class="asidebar dark:bg-box-dark fixed start-0 top-0 z-[1035] h-screen overflow-hidden bg-white xl:!w-[280px] xl:[&.collapsed]:!w-[80px] [&.collapsed]:!w-[250px] xl:[&.TopCollapsed]:!w-[0px] [&.TopCollapsed]:!w-[250px] !transition-all !duration-[0.2s] ease-linear delay-[0s] !w-0 xl:[&.collapsed>.logo-wrapper]:w-[80px]">
   <!-- Logo -->
   <div class="flex w-[280px] border-e border-[#edf2f9] dark:border-box-dark-up logo-wrapper items-center h-[71px] dark:bg-box-dark-up max-xl:hidden">
-     <a href="index.html" class="block text-center">
+     <a href="/admin" class="block text-center">
         <div class="logo-full">
            <img class="ps-[27px] dark:hidden" src="/images/logos/logo.png" alt="Logo" style="height: 70px">
            <img class="ps-[27px] hidden dark:block" src="/images/logos/logo.png" alt="Logo">
