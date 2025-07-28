@@ -7,6 +7,8 @@
 
 	let main_data: any = [];
 	let loading = false;
+
+	let userData :any = getAuthCookie();
 	
 
 	async function fetchData() {
@@ -35,7 +37,7 @@
 	<Abercrome titre="Tableau de bord" parent="Dashbord" current="statistques" />
 	<!-- Responsive Toggler -->
 	<div class="col-span-12">
-		<!-- <h1>{JSON.stringify(getAuthCookie())}</h1> -->
+		<!-- <h1>{JSON.stringify(userData.token)}</h1> -->
 	
 		<div class="grid grid-cols-12 gap-[25px]">
 			<CardStat title="Total missions" total={main_data.nb_missions}  icon="uil uil-arrow-growth" />

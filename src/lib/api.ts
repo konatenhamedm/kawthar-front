@@ -2,6 +2,7 @@ import * as cookie from 'cookie';
 export const BASE_URL_API_LOGIN = "https://back.kawthar-expertise.com/api";
 export const BASE_URL_API = "https://back.kawthar-expertise.com/web";
 export const BASE_URL_API_DEUX = "https://back.kawthar-expertise.com/api";
+import { getAuthCookie, logout } from '$lib/auth';
 
 export const BASE_URL_API_UPLOAD = "https://back.kawthar-expertise.com";
 
@@ -17,9 +18,12 @@ export async function apiFetch(
   
   // Si on est côté client (navigateur)
   if (typeof window !== 'undefined') {
-    const cookies = cookie.parse(document.cookie);
-    token = cookies.token; // Supposant que votre token est stocké dans un cookie nommé "token"
+       const cookies = cookie.parse(document.cookie);
+       const auth = JSON.parse(cookies.auth);
+        token =auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
   }
+
+  //alert( token )
 
   // Définition des headers avec typage correct
   const headers: Record<string, string> = {
