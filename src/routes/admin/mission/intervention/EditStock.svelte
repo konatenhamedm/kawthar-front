@@ -2,7 +2,7 @@
 import * as cookie from 'cookie';
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { apiFetch, BASE_URL_API } from '$lib/api';
-	import { Button, Modal, Select } from 'flowbite-svelte';
+	
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
