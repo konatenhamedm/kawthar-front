@@ -106,7 +106,7 @@
 		} catch (error) {
 			isLoad = false;
 
-			// Afficher une notification d'erreur
+			// Afficher une notification d'erreur nnnnnn
 			notificationMessage = error?.message;
 			notificationType = 'error';
 			showNotification = true;
