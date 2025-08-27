@@ -61,7 +61,7 @@
       icon: "uil uil-chart",
       path: `${BASE_PATH}/mission/intervention`
     },
-    {
+    /* {
       isSectionTitle: true,
       title: "Reporting"
     },
@@ -69,7 +69,7 @@
       title: "Statistiques",
       icon: "uil uil-chart",
       path: `${BASE_PATH}/mission/statistique`
-    }
+    } */
   ];
 
   // Classes CSS réutilisables

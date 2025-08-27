@@ -72,7 +72,7 @@
 				id="right-ellipsis-trigger"
 				class="mb-0 hidden flex-auto list-none items-center justify-end gap-y-[15px] ps-0 max-xl:absolute max-xl:end-0 max-xl:top-[70px] max-xl:z-[1000] max-xl:m-0 max-xl:rounded-lg max-xl:border-none max-xl:bg-white max-xl:bg-clip-padding max-xl:px-[20px] max-xl:py-[10px] max-xl:text-left max-xl:shadow-lg max-sm:gap-x-[15px] max-sm:px-[15px] sm:gap-x-[25px] xl:flex max-xl:dark:bg-neutral-700 max-xl:[&.active]:flex"
 			>
-				<li>
+				<!-- <li>
 					<div class="relative" data-te-dropdown-ref>
 						<button
 							id="message"
@@ -114,7 +114,7 @@
 							</div>
 						</div>
 					</div>
-				</li>
+				</li> -->
 
 				<li>
 					<div class="relative" data-te-dropdown-ref>
