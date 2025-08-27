@@ -13,25 +13,21 @@ export async function apiFetch(
   data: any = null,
   options: RequestInit = {}
 ): Promise<any> {
-  // Récupération du token depuis les cookies
+ 
   let token: string | undefined;
   
-  // Si on est côté client (navigateur)
   if (typeof window !== 'undefined') {
        const cookies = cookie.parse(document.cookie);
        const auth = JSON.parse(cookies.auth);
-        token =auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
+        token =auth.token; 
   }
 
-  //alert( token )
-
-  // Définition des headers avec typage correct
   const headers: Record<string, string> = {
     ...(method !== "GET" ? { "Content-Type": "application/json","Accept": "application/json" } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
 
-  // Configuration de la requête
+
   const requestOptions: RequestInit = {
     ...options,
     method,

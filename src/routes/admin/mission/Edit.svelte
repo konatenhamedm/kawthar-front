@@ -23,6 +23,7 @@
 	interface LigneEquipe {
 		id: any;
 		idF: any;
+		mission_id: any;
 		equipe_id: any;
 		date_fin_intervention: any;
 		date_debut_intervention: string;
@@ -34,6 +35,7 @@
 		date_debut: string;
 		entreprise_id: string;
 		description: any;
+		mission_id: any;
 		adresse_mission: any;
 		date_fin: string;
 		type_mission_id: string;
@@ -45,6 +47,7 @@
 		libelle: '',
 		date_debut: '',
 		entreprise_id: '',
+		mission_id : "",
 		description: '',
 		adresse_mission: '',
 		date_fin: '',
@@ -62,6 +65,7 @@
 			date_debut_intervention: formatDate(item.date_debut_intervention),
 			date_fin_intervention: formatDate(item.date_fin_intervention),
 			description: item.description,
+			mission_id: item.id,
 			equipe_id: item.equipe?.id ?? null // on garde seulement l’id
 		}));
 	}
@@ -150,6 +154,7 @@
 			{
 				id: null,
 				idF: Date.now(),
+				mission_id: data.id,
 				description: '',
 				equipe_id: '',
 				date_debut_intervention: '',

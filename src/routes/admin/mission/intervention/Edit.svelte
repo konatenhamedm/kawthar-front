@@ -1,5 +1,6 @@
 <script lang="ts">
-	
+	import * as cookie from 'cookie';
+
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { apiFetch, BASE_URL_API } from '$lib/api';
 	import { Button, Modal, Select } from 'flowbite-svelte';
@@ -17,6 +18,13 @@
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
+	let token: string | undefined;
+
+	if (typeof window !== 'undefined') {
+		const cookies = cookie.parse(document.cookie);
+		const auth = JSON.parse(cookies.auth);
+		token = auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
+	}
 
 	let showNotification = false;
 	let notificationMessage = '';
@@ -39,7 +47,7 @@
 		description: string;
 		agent_create_id: any;
 		entreprise_id: any;
-		qr_bar_code:any,
+		qr_bar_code: any;
 		missions_id: any;
 		emplacement_id: any;
 		nature_id: any;
@@ -212,7 +220,11 @@
 
 			const res = await fetch(BASE_URL_API + '/ligneInventaires/immo/multiple/create', {
 				method: 'POST',
-				headers: { Accept: 'application/json' },
+				headers: {
+					Accept: 'application/json',
+
+					Authorization: `Bearer ${token}`
+				},
 				body: formData
 			});
 
@@ -250,7 +262,7 @@
 			{
 				idF: Date.now(),
 				id: '',
-		nom_agent: '',
+				nom_agent: '',
 
 				qr_bar_code: '',
 				libelle: '',
@@ -284,18 +296,13 @@
 	}
 	// Supprimer une ligne d'intervention
 	async function supprimerIntervention(id: number, idF: any) {
-		
-
-		if(id == idF){
+		if (id == idF) {
 			const resultat = await confirmDelete(id);
 
-			if(resultat)
-				mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
-		}else{
-
+			if (resultat) mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
+		} else {
 			mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
 		}
-
 	}
 </script>
 

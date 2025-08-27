@@ -16,12 +16,14 @@
 	import type { Mission } from '../../../../types';
 	import EditStock from './EditStock.svelte';
 	import MenuInventaire from '$components/_includes/MenuInventaire.svelte';
+	import SendMail from './SendMail.svelte';
 
 	let main_data: Mission[] = [];
 	let searchQuery = ''; // Pour la recherche par texte
 	let currentPage = 1;
 	let loading = false;
 	let openDelete = false;
+	let send = false;
 	let openEdit = false;
 	let openAdd = false;
 	let openShow = false;
@@ -84,7 +86,7 @@
 	}
 
 	// Rafraîchir les données après fermeture des modales
-	$: if (!openAdd || !openEdit || !openShow) {
+	$: if (!openAdd || !openEdit || !openShow || !send) {
 		refreshDataIfNeeded();
 	}
 
@@ -97,6 +99,9 @@
 			openEdit = true;
 		} else if (action === 'delete') {
 			openDelete = true;
+		
+		} else if (action === 'send') {
+			send = true;
 		}
 	};
 
@@ -111,6 +116,12 @@
 		{
 			action: 'view',
 			title: 'Modifier',
+			icon: 'book',
+			color: 'warning'
+		},
+		{
+			action: 'send',
+			title: 'Send mail',
 			icon: 'book',
 			color: 'warning'
 		}
@@ -180,6 +191,10 @@
 					  
 							<th style="width: 10px;text-align: center;"
 							  class="border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase">
+							  Nbre inventaire
+							</th>
+							<th style="width: 10px;text-align: center;"
+							  class="border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase">
 							  Action
 							</th>
 						  </tr>
@@ -235,6 +250,9 @@
 								<td class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize">
 								  {item.typeMission ? item.typeMission.libelle : ''}
 								</td>
+								<td class="border border-gray-300 px-4 py-2.5 text-[14px] text-bold font-normal whitespace-nowrap capitalize" style="text-align: center;">
+								  {item.inventaires.length }
+								</td>
 								
 								<td class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end" style="text-align: center;">
 									<MenuInventaire item={item} onAction={handleAction} {actions} type={item.typeMission?.code} />
@@ -266,6 +284,9 @@
 
 <Modale bind:open={openEdit} size="full" title="Inventaires immobilisation">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
+</Modale>
+<Modale bind:open={send} size="xl" title="Envoi un rapport">
+	<SendMail bind:open={send} data={current_data} on:updated={fetchData} />
 </Modale>
 <Modale bind:open={openShow} size="full" title="Inventaires stock">
 	<EditStock bind:open={openShow} data={current_data} on:updated={fetchData} />

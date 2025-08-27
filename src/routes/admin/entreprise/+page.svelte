@@ -189,7 +189,7 @@
 							  </th>
 							{/each}
 					  
-							<th scope="col" style="width: 150px; text-align: center;"
+							<th scope="col" style="width: 10px; text-align: center;"
 							  class="border border-gray-300 dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase">
 							  Action
 							</th>

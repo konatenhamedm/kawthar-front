@@ -193,7 +193,7 @@
 								{/each}
 
 								<th
-									scope="col" style="width: 200px;text-align: center;"
+									scope="col" style="width: 10px;text-align: center;"
 									class="dark:bg-box-dark-up text-body-header dark:text-title-dark rounded-e-[6px] border-none bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase before:hidden"
 								>
 									Action</th
