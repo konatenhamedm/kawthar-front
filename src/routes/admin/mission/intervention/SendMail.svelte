@@ -1,8 +1,7 @@
 <script lang="ts">
-	
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { apiFetch, BASE_URL_API, BASE_URL_API_UPLOAD } from '$lib/api';
-	
+	import * as cookie from 'cookie';
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
@@ -11,6 +10,15 @@
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
+
+		let token: string | undefined;
+
+	if (typeof window !== 'undefined') {
+		const cookies = cookie.parse(document.cookie);
+		const auth = JSON.parse(cookies.auth);
+		token = auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
+	}
+
 
 	let showNotification = false;
 	let notificationMessage = '';
@@ -30,35 +38,61 @@
 		item.mission_id = data.id;
 		item.entreprise = data.entrepriseMagasin;
 	}
-
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(true, '/ligneInventaire/sendReport', 'POST', {
-				mission_id: item.libelle,
-				email: item.email
+			const response = await fetch(BASE_URL_API+ '/missions/getReport/' + data?.id, {
+				method: 'GET',
+			 headers: { 
+					Accept: 'application/json', 
+					Authorization: `Bearer ${token}` 
+				},
 			});
 
-			if (res) {
-				isLoad = false;
-				open = false;
-				notificationMessage = res.message;
-				notificationType = 'success';
-				showNotification = true;
-			} else {
-				notificationMessage = 'Une erreur est ';
-				notificationType = 'error';
-				showNotification = true;
+			if (!response.ok) {
+				throw new Error('Erreur lors du téléchargement');
 			}
+
+			// Récupérer le blob et le nom du fichier
+			const blob = await response.blob();
+
+			// Essayer de récupérer le nom du fichier depuis les headers
+			const contentDisposition = response.headers.get('Content-Disposition');
+			let filename = 'rapport.xlsx'; // nom par défaut
+
+			if (contentDisposition) {
+				const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+				if (filenameMatch && filenameMatch[1]) {
+					filename = filenameMatch[1];
+				}
+			}
+
+			// Créer un URL temporaire pour le blob
+			const url = window.URL.createObjectURL(blob);
+
+			// Créer un élément anchor pour déclencher le téléchargement
+			const a = document.createElement('a');
+			a.style.display = 'none';
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+
+			// Nettoyer
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+
+			isLoad = false;
+			open = false;
+			notificationMessage = 'Téléchargement réussi';
+			notificationType = 'success';
+			showNotification = true;
 		} catch (error) {
 			isLoad = false;
-
-			// Afficher une notification d'erreur
-			notificationMessage = error?.message;
+			notificationMessage = error?.message || 'Une erreur est survenue';
 			notificationType = 'error';
 			showNotification = true;
-
-			console.error('Error saving:', error);
+			console.error('Error downloading:', error);
 		}
 	}
 

@@ -15,11 +15,14 @@ export async function handle({event, resolve}) {
   }
 
   const isAdminRoute = event.url.pathname.startsWith('/admin');
-  const isLoginPage = event.url.pathname === '/login';
+  const isLoginPage = event.url.pathname === '/';
 
   if (isAdminRoute && !user) {
-    return redirect(302, '/login');
+    return redirect(302, '/');
   }
+/*   if (!user) {
+    return redirect(302, '/');
+  } */
 
   // (Optionnel) empêcher un utilisateur déjà connecté d'aller sur /login
   if (isLoginPage && user) {

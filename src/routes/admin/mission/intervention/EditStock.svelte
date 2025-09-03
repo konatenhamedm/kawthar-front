@@ -1,8 +1,8 @@
 <script lang="ts">
-import * as cookie from 'cookie';
+	import * as cookie from 'cookie';
 	import InputSimple from '$components/inputs/InputSimple.svelte';
 	import { apiFetch, BASE_URL_API } from '$lib/api';
-	
+
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
@@ -14,18 +14,27 @@ import * as cookie from 'cookie';
 	import type { MissionEdit } from '../../../../types';
 	import ImageInputNew from '$components/inputs/ImageInputNew.svelte';
 	import QrCode from '$components/inputs/QrCode.svelte';
+	import Pagination from '$components/Pagination.svelte';
+	import MenuInventaire from '$components/_includes/MenuInventaire.svelte';
+	import Menu from '$components/_includes/Menu.svelte';
+	import Modale from '$components/Modales/Modale.svelte';
+	import AddIntervention from './AddIntervention.svelte';
+	import ShowIntervention from './ShowIntervention.svelte';
+	import DeleteIntervention from './DeleteIntervention.svelte';
 
 	export let open: boolean = false; // modal control
 	let isLoad = false;
 
+	function cancelDelete() {
+		open = false;
+	}
 	let token: string | undefined;
-  
- 
-  if (typeof window !== 'undefined') {
-       const cookies = cookie.parse(document.cookie);
-       const auth = JSON.parse(cookies.auth);
-        token =auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
-  }
+
+	if (typeof window !== 'undefined') {
+		const cookies = cookie.parse(document.cookie);
+		const auth = JSON.parse(cookies.auth);
+		token = auth.token; // Supposant que votre token est stocké dans un cookie nommé "token"
+	}
 
 	let showNotification = false;
 	let notificationMessage = '';
@@ -37,18 +46,15 @@ import * as cookie from 'cookie';
 	let utilites: any = [];
 	let userdata: any = [];
 	let types: any = [];
-	// Initializing the user object with only email and status
 
-	/* "id": 0,
-      "libelle": "string",
-      "ref_article": "string",
-      "description": "string",
-      "agent_create_id": 0,
-      "entreprise_id": 0,
-      "missions_id": 0,
-      "is_site_id": 0,
-      "is_utilite_id": 0,
-      "image_url": "string" */
+	let code: any;
+
+	let currentPage = 1;
+	let openDelete = false;
+	let openEdit = false;
+	let openAdd = false;
+	let openShow = false;
+	let current_data = {};
 
 	interface LigneInventaireFormatee {
 		id: any;
@@ -64,6 +70,7 @@ import * as cookie from 'cookie';
 		is_utilite_id: any;
 		qr_bar_code: any;
 		image_url: any;
+		date_scan: any;
 	}
 	interface LigneInventaireFormat_ {
 		id: any;
@@ -78,6 +85,7 @@ import * as cookie from 'cookie';
 		site: any;
 		utilite: any;
 		image_url: any;
+		date_scan: any;
 	}
 
 	interface Mission {
@@ -85,9 +93,9 @@ import * as cookie from 'cookie';
 		libelle: string;
 		date_debut: string;
 		entreprise_id: string | null;
-		entrepriseMagasin: any[]; // → remplacez `any` par votre vrai type
-		ligneEquipes: any[]; // idem
-		typeMission: any[]; // idem
+		entrepriseMagasin: any[];
+		ligneEquipes: any[];
+		typeMission: any[];
 		description: string;
 		mission_id: any;
 		adresse_mission: string;
@@ -119,39 +127,38 @@ import * as cookie from 'cookie';
 		return date.toISOString().split('T')[0];
 	}
 
-	/* 	function formatDate(dateString: string): string {
-		return new Date(dateString).toISOString().split('T')[0];
-	} */
-
 	function formatLignesInventaire(source = []) {
 		return source.map((item: LigneInventaireFormat_) => ({
 			id: item.id,
-			idF: item.id, // ou un autre identifiant si différent
+			idF: item.id,
 			libelle: item.libelle,
 			ref_article: item.ref_article,
 			description: item.description,
 			missions_id: data?.id,
 			nom_agent: item.agent_create.nom + ' ' + item.agent_create.prenoms,
 			agent_create_id: item.agent_create.id,
-			entreprise_id: item.entreprise.id,
-			is_site_id: item.site.id,
-			is_utilite_id: item.utilite.id,
+			entreprise_id: item.entreprise.libelle,
+			is_site_id: item.site.libelle,
+			is_utilite_id: item.utilite.libelle,
 			qr_bar_code: item.qr_bar_code,
-			image_url: item.image_url
+			image_url: item.image_url,
+			date_scan: item.date_scan
 		}));
 	}
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
-		((mission.libelle = data?.libelle),
-			(mission.date_debut = data?.date_debut),
-			(mission.entreprise_id = data?.entrepriseMagasin != null ? data?.entrepriseMagasin.id : null),
-			(mission.type_mission_id = data?.typeMission != null ? data?.typeMission.id : null),
-			(mission.description = data?.description),
-			(mission.date_fin = data?.date_fin),
-			(mission.adresse_mission = data?.adresse_mission),
-			(mission.inventaires = formatLignesInventaire(data?.inventaires)));
+		mission.libelle = data?.libelle;
+		mission.date_debut = data?.date_debut;
+		mission.entreprise_id = data?.entrepriseMagasin != null ? data?.entrepriseMagasin.id : null;
+		mission.type_mission_id = data?.typeMission != null ? data?.typeMission.id : null;
+		mission.description = data?.description;
+		mission.date_fin = data?.date_fin;
+		mission.adresse_mission = data?.adresse_mission;
+		mission.inventaires = formatLignesInventaire(data?.inventaires);
+
+		code = data?.typeMission.code;
 	}
 
 	async function getData() {
@@ -186,125 +193,110 @@ import * as cookie from 'cookie';
 		await getDataUser();
 	});
 
-	/* 	function formatDate(dateString: string | null | undefined): string {
-	if (!dateString) return '';
-	const date = new Date(dateString);
-	return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
-} */
-
-	async function SaveFunction() {
-		isLoad = true;
-
-		try {
-			const formData = new FormData();
-
-			// Champs mission principaux
-			formData.append('mission_id', data?.id ?? '');
-
-			// Champs des lignes d'inventaire
-			mission.inventaires.forEach((item: LigneInventaireFormatee, index) => {
-				formData.append(`lignes[${index}][id]`, item.id ?? '');
-				formData.append(`lignes[${index}][libelle]`, item.libelle ?? '');
-				formData.append(`lignes[${index}][ref_article]`, item.ref_article ?? '');
-				formData.append(`lignes[${index}][agent_create_id]`, item.agent_create_id ?? '');
-				formData.append(`lignes[${index}][description]`, item.description ?? '');
-				formData.append(`lignes[${index}][mission_id]`, data?.id ?? '');
-				formData.append(`lignes[${index}][entreprise_magasin_id]`, item.entreprise_id ?? '');
-				formData.append(`lignes[${index}][is_site_id]`, item.is_site_id ?? '');
-				formData.append(`lignes[${index}][is_utilite_id]`, item.is_utilite_id ?? '');
-				// Envoi du fichier image s'il existe
-				if (item.image_url instanceof File) {
-					formData.append(`lignes[${index}][image_url]`, item.image_url);
-				}
-			});
-
-			for (const [key, value] of formData.entries()) {
-				console.log(`${key}:`, value);
-			}
-			// Appel API avec FormData
-			/* 		const res = await apiFetch(true, '/ligneInventaires/immo/multiple/create', 'POST', formData, {
-			headers: {
-				Accept: 'application/json'
-			}
-		}); */
-
-			const res = await fetch(BASE_URL_API + '/ligneInventaires/stock/multiple/create', {
-				method: 'POST',
-				headers: { Accept: 'application/json' ,
-				Authorization: `Bearer ${token}`
-				},
-				body: formData
-			});
-
-			if (res.ok) {
-				isLoad = false;
-				open = false;
-				notificationMessage = 'Mission enregistrée avec succès !';
-				notificationType = 'success';
-				showNotification = true;
-			} else {
-				isLoad = false;
-				notificationMessage = res.message || 'Erreur lors de l’enregistrement.';
-				notificationType = 'error';
-				showNotification = true;
-			}
-		} catch (error) {
-			isLoad = false;
-			notificationMessage = error?.message ?? 'Erreur inconnue.';
-			notificationType = 'error';
-			showNotification = true;
-			console.error('Erreur lors de la sauvegarde :', error);
-		}
-	}
-
-	function handleModalClose(event: Event) {
-		if (isLoad) {
-			event.preventDefault();
-		}
-	}
-
-	// Ajouter une nouvelle ligne d'intervention
-	function ajouterIntervention(): void {
-		mission.inventaires = [
-			...mission.inventaires,
-			{
-				idF: Date.now(),
-				id: '',
-				nom_agent: '',
-				libelle: '',
-				qr_bar_code: '',
-				ref_article: '',
-				is_site_id: '',
-				agent_create_id: '',
-				missions_id: mission.id,
-				entreprise_id: mission.entreprise_id,
-				is_utilite_id: '',
-				image_url: '',
-				description: ''
-			}
-		];
-	}
-
 	async function confirmDelete(id: any) {
 		try {
 			const res = await apiFetch(true, '/ligneInventaires/delete/' + id, 'DELETE');
-
 			return res;
 		} catch (error) {
 			console.error('Error deleting:', error);
-		} finally {
 		}
 	}
 
-	// Supprimer une ligne d'intervention
-	async function supprimerIntervention(id: number, idF: any) {
-		if (id == idF) {
-			const resultat = await confirmDelete(id);
+	$: totalPages = Math.max(1, Math.ceil(mission.inventaires.length / 5));
 
-			if (resultat) mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
-		} else {
-			mission.inventaires = mission.inventaires.filter((i) => i.idF !== id);
+	$: startRange = mission.inventaires.length === 0 ? 0 : (currentPage - 1) * 5 + 1;
+	$: endRange = Math.min(currentPage * 5, mission.inventaires.length);
+
+	$: if (currentPage > totalPages) {
+		currentPage = totalPages;
+	}
+
+	$: if (mission.inventaires.length === 0) {
+		currentPage = 1;
+	}
+
+	// Fonction pour rafraîchir les données d'inventaire
+	async function refreshDataIfNeeded() {
+		try {
+			// Récupérer uniquement les inventaires depuis l'API
+			const res = await apiFetch(true, `/ligneInventaires/mission/${data?.id}`);
+			const updatedInventaires = res.data;
+
+			// Mettre à jour uniquement les inventaires
+			mission.inventaires = formatLignesInventaire(updatedInventaires);
+
+			
+		} catch (error) {
+			console.error('Error fetching inventaires:', error);
 		}
+	}
+
+	$: if (!openAdd && !openEdit && !openShow && !openDelete) {
+		refreshDataIfNeeded();
+	}
+
+	// Fonction pour gérer les événements de mise à jour des modales
+	function handleUpdated(event: CustomEvent) {
+		const { action, data: updatedData } = event.detail;
+
+		if (action === 'add' || action === 'edit') {
+			// Ajouter ou mettre à jour l'élément dans la liste
+			if (action === 'add') {
+				mission.inventaires = [...mission.inventaires, updatedData];
+			} else if (action === 'edit') {
+				mission.inventaires = mission.inventaires.map((item) =>
+					item.id === updatedData.id ? updatedData : item
+				);
+			}
+
+			// Afficher une notification
+			notificationMessage =
+				action === 'add' ? 'Intervention ajoutée avec succès' : 'Intervention modifiée avec succès';
+			notificationType = 'success';
+			showNotification = true;
+		} else if (action === 'delete') {
+			// Supprimer l'élément de la liste
+			mission.inventaires = mission.inventaires.filter((item) => item.id !== updatedData.id);
+
+			// Afficher une notification
+			notificationMessage = 'Intervention supprimée avec succès';
+			notificationType = 'success';
+			showNotification = true;
+		}
+
+		// Rafraîchir la pagination
+		currentPage = 1;
+	}
+
+	// Fonction de callback pour gérer les actions
+	const handleAction = (action: any, item: any) => {
+		current_data = item;
+		if (action === 'view') {
+			openShow = true;
+		} else if (action === 'add') {
+			openAdd = true;
+		} else if (action === 'delete') {
+			openDelete = true;
+		}
+	};
+
+	const actions = [
+		{
+			action: 'view',
+			title: 'Voir',
+			icon: 'eye',
+			color: 'primary'
+		},
+		{
+			action: 'delete',
+			title: 'Supprimer',
+			icon: 'trash-alt',
+			color: 'danger'
+		}
+	];
+
+	function handlePageChange(event: CustomEvent) {
+		currentPage = event.detail;
 	}
 </script>
 
@@ -314,13 +306,7 @@ import * as cookie from 'cookie';
 
 	<div class="space-y-6">
 		<form action="#" use:init>
-			<!-- Champ Email -->
-			<!-- libelle: string; date_debut: string; date_fin: string; entreprise_id: string; type_mission_id:
-			string; adresse_mission: any; description: any; -->
-
 			<div class="grid grid-cols-3 gap-3">
-				<!-- <InputMultiSelect options={equipes} bind:selected />
-				<AutreInputSimple options={equipes} bind:selected={selected2}/> -->
 				<InputSimple
 					type="text"
 					fieldName="libelle"
@@ -365,7 +351,7 @@ import * as cookie from 'cookie';
 				/>
 			</div>
 
-			<div class="shadow-gray col-span-12 shadow">
+			<div class="shadow-gray col-span-12 mt-8 shadow">
 				<div
 					class="bg-blue dark:bg-box-dark text-body dark:text-subtitle-dark rounded-10 m-0 p-0 text-[15px]"
 				>
@@ -382,94 +368,167 @@ import * as cookie from 'cookie';
 							data-te-ripple-init=""
 							data-te-ripple-color="light"
 							style=""
-							on:click={ajouterIntervention}
+							on:click={() => (
+								(current_data = {
+									type: code,
+									mission: data?.id,
+									entreprise_id: mission.entreprise_id
+								}),
+								(openAdd = true)
+							)}
 						>
 							<i class="uil uil-plus text-[18px]"></i>
 						</button>
 					</div>
-					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
+					<div class="flex items-center gap-[15px] p-[10px]" style="background-color: #d8ccccf;">
 						<div
 							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
 						>
-							<div>
-								{#each mission.inventaires as item, index (item.idF)}
-									<div
-										class="text-surface shadow-secondary-1 dark:bg-surface-dark block rounded-lg bg-white dark:text-white"
-									>
-										<div
-											class="flex flex-wrap items-center justify-between border-b-2 border-neutral-100 px-6 py-3 dark:border-white/10"
-										>
-											<h2>Agent <strong>({item.nom_agent})</strong></h2>
-
-											<button
-												on:click={() => supprimerIntervention(item.id, item.idF)}
-												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold text-white capitalize transition duration-300 ease-in-out hover:text-white`}
-												title={`delete`}
+							<table
+								class="min-w-full border-collapse border border-gray-300 text-start text-sm font-light"
+							>
+								<thead class="font-medium text-white">
+									<tr class="" style="background-color:rgb(254 162 3)">
+										{#each ['Libelle', 'Ref article', 'Nom agent', 'Entreprise', 'Site', 'Utilite'] as title}
+											<th
+												class="border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase"
 											>
-												<i class={`uil uil-trash-alt`}></i>
-											</button>
-										</div>
-										<div class="p-3">
-											<QrCode text={item.qr_bar_code}/><br>
-											<div class="mb-3 grid grid-cols-3 gap-3">
-												<InputSimple
-													type="text"
-													fieldName="libelle"
-													label="Libellé"
-													bind:field={item.libelle}
-													placeholder="Entrez le libelle"
-												/>
-												<InputSimple
-													type="text"
-													fieldName="ref_article"
-													label="Ref article"
-													bind:field={item.ref_article}
-													placeholder="Entrez la ref article"
-												/>
-												<InputSelect
-													label="Site"
-													bind:selectedId={item.is_site_id}
-													datas={sites}
-													id="is_site_id"
-												/>
-											</div>
-											<div class="mb-3 grid grid-cols-3 gap-3">
-												<InputSelect
-													label="Utilité"
-													bind:selectedId={item.is_utilite_id}
-													datas={utilites}
-													id="is_utilite_id"
-												/>
+												{title}
+											</th>
+										{/each}
+										<th
+											style="width: 10px;text-align: center;"
+											class="border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase"
+										>
+											Vérifié
+										</th>
+										<th
+											style="width: 10px;text-align: center;"
+											class="border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-end text-[15px] font-medium uppercase"
+										>
+											Action
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#if mission.inventaires.length === 0}
+										<tr>
+											<td colspan="7" class="border border-gray-300 py-4 text-center">
+												Aucun résultat trouvé avec les critères de filtrage actuels
+											</td>
+										</tr>
+									{:else}
+										{#each mission.inventaires as item, i}
+											<tr class="group">
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.libelle}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.ref_article}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.nom_agent}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.entreprise_id}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.is_site_id}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{item.is_utilite_id}
+												</td>
+												<td
+													class="border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+												>
+													{#if item.date_scan}
+														<svg
+															width="30"
+															height="30"
+															viewBox="0 0 200 200"
+															xmlns="http://www.w3.org/2000/svg"
+														>
+															<circle cx="100" cy="100" r="90" fill="url(#gradient)" />
+															<path
+																d="M50,100 L85,135 L150,70"
+																fill="none"
+																stroke="white"
+																stroke-width="12"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															/>
+															<defs>
+																<linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+																	<stop offset="0%" stop-color="#32CD32" />
+																	<stop offset="100%" stop-color="#32CD32" />
+																</linearGradient>
+															</defs>
+														</svg>
+													{:else}
+														<svg
+															width="30"
+															height="30"
+															viewBox="0 0 200 200"
+															xmlns="http://www.w3.org/2000/svg"
+														>
+															<circle cx="100" cy="100" r="90" fill="url(#redGradient)" />
+															<path
+																d="M70,70 L130,130 M70,130 L130,70"
+																fill="none"
+																stroke="white"
+																stroke-width="12"
+																stroke-linecap="round"
+															/>
+															<defs>
+																<linearGradient
+																	id="redGradient"
+																	x1="0%"
+																	y1="0%"
+																	x2="100%"
+																	y2="100%"
+																>
+																	<stop offset="0%" stop-color="#FF3333" />
+																	<stop offset="100%" stop-color="#CC0000" />
+																</linearGradient>
+															</defs>
+														</svg>
+													{/if}
+												</td>
 
-												<InputUserSelect
-													label="Agent"
-													bind:selectedId={item.agent_create_id}
-													datas={userdata}
-													id="agent_create_id"
-												/>
-												<ImageInputNew
-													label="Image"
-													fieldName="image_url"
-													bind:field={item.image_url}
-													placeholder="Sélectionnez une image"
-													showPreview={true}
-													link={item.image_url ? item.image_url : ''}
-												/>
-											</div>
+												<td
+													class="text-dark dark:text-title-dark rounded-e-[6px] border border-gray-300 px-4 py-2.5 text-end text-[14px] font-normal capitalize"
+													style="text-align: center;"
+												>
+													<Menu {item} onAction={handleAction} {actions} />
+												</td>
+											</tr>
+										{/each}
+									{/if}
+								</tbody>
+							</table>
 
-											<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
-												<InputTextArea
-													fieldName="description"
-													label="Description"
-													bind:field={item.description}
-													placeholder="Entrez une description"
-												/>
-											</div>
-										</div>
-									</div>
-									<div class="mb-[7px] h-2 border-b-2 border-black"></div>
-								{/each}
-							</div>
+							{#if mission.inventaires.length > 0 && totalPages > 1}
+								<Pagination
+									{currentPage}
+									{totalPages}
+									{startRange}
+									{endRange}
+									totalItems={mission.inventaires.length}
+									on:pageChange={handlePageChange}
+								/>
+							{/if}
 						</div>
 					</div>
 				</div>
@@ -479,24 +538,14 @@ import * as cookie from 'cookie';
 
 	<!-- Card Footer -->
 	<div class="flex justify-end border-t border-gray-200 pt-4">
-		{#if isLoad}
-			<button
-				disabled
-				class="cursor-not-allowed rounded bg-blue-500 px-4 py-2 text-white opacity-50"
-			>
-				<div class="flex items-center space-x-2">
-					<div class="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
-					<span>Chargement...</span>
-				</div>
-			</button>
-		{:else}
-			<button
-				on:click={SaveFunction}
-				class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-			>
-				Enregistrer
-			</button>
-		{/if}
+		<button
+			style="margin-right: 9px;"
+			on:click={cancelDelete}
+			disabled={isLoad}
+			class="mr-[9px] rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+		>
+			Annuler
+		</button>
 	</div>
 </div>
 
@@ -504,3 +553,29 @@ import * as cookie from 'cookie';
 {#if showNotification}
 	<Notification message={notificationMessage} type={notificationType} duration={5000} />
 {/if}
+
+<Modale bind:open={openAdd} size="2xl" title="Créer une intervention">
+	<AddIntervention
+		bind:open={openAdd}
+		data={current_data}
+		on:updated={handleUpdated}
+		on:close={() => (openAdd = false)}
+	/>
+</Modale>
+
+<Modale bind:open={openShow} size="2xl" title="Détails interventions">
+	<ShowIntervention
+		bind:open={openShow}
+		data={current_data}
+		on:updated={handleUpdated}
+		on:close={() => (openShow = false)}
+	/>
+</Modale>
+<Modale bind:open={openDelete} size="xl" title="Supprimer une équipe">
+	<DeleteIntervention
+		bind:open={openDelete}
+		data={current_data}
+		on:updated={handleUpdated}
+		on:close={() => (openDelete = false)}
+	/>
+</Modale>

@@ -201,10 +201,10 @@
 			</div>
 			<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
 				<InputTextArea
-					fieldName="entreprise"
-					label="Entreprise"
+					fieldName="description"
+					label="Description"
 					bind:field={mission.description}
-					placeholder="Entrez l'entreprise"
+					placeholder="Entrez une description"
 				/>
 			</div>
 			<div class="shadow-gray col-span-12 shadow">

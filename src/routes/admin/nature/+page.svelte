@@ -277,15 +277,15 @@
 </div>
 
 
-<Modale bind:open={openAdd} size="xl" title="Créer un site">
+<Modale bind:open={openAdd} size="xl" title="Créer une nature">
 	<Add bind:open={openAdd} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openEdit} size="xl" title="Modifier un site">
+<Modale bind:open={openEdit} size="xl" title="Modifier une nature">
 	<Edit bind:open={openEdit} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openShow} size="xl" title="Détails d'un site">
+<Modale bind:open={openShow} size="xl" title="Détails d'une nature">
 	<Show bind:open={openShow} data={current_data} on:updated={fetchData} />
 </Modale>
-<Modale bind:open={openDelete} size="xl" title="Supprimer un site">
+<Modale bind:open={openDelete} size="xl" title="Supprimer une nature">
 	<Delete bind:open={openDelete} data={current_data} on:updated={fetchData} />
 </Modale>

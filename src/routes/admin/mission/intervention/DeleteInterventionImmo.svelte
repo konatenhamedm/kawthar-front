@@ -1,21 +1,11 @@
 <script lang="ts">
-    import { BASE_URL_API } from '$lib/api';
+    import { apiFetch, BASE_URL_API } from '$lib/api';
     import { Button, Modal } from 'flowbite-svelte';
     import Notification from '$components/_includes/Notification.svelte';
     import { onMount } from 'svelte';
 
-    import * as cookie from 'cookie';
-
     export let open: boolean = false; // modal control
     let isLoad = false;
-
-	let token: string | undefined;
-
-	if (typeof window !== 'undefined') {
-		const cookies = cookie.parse(document.cookie);
-		const auth = JSON.parse(cookies.auth);
-		token = auth.token;
-	}
   
     let showNotification = false;
     let notificationMessage = '';
@@ -30,20 +20,14 @@
     async function confirmDelete() {
         isLoad = true;
         try {
-            const res = await fetch(BASE_URL_API + '/missions/delete/' + data?.id, {
-                method: 'DELETE',
-              headers: { 
-					Accept: 'application/json', 
-					Authorization: `Bearer ${token}` 
-				},
-            });
+            const res = await apiFetch(true , '/ligneInventaires/delete/' + data?.id,'DELETE');
             
-            if (res.ok) {
+            if (res) {
                 notificationMessage = 'Utilisateur supprimé avec succès!';
                 notificationType = 'success';
                 open = false;
             } else {
-                notificationMessage = 'Erreur lors de la suppression';
+                notificationMessage = (res.message);
                 notificationType = 'error';
             }
             showNotification = true;
@@ -73,7 +57,7 @@
     <!-- Message d'alerte -->
     <div class="text-center">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Confirmer la suppression</h3>
-        <p class="text-gray-500">Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+        <p class="text-gray-500">Êtes-vous sûr de vouloir supprimer cette équipe ({data?.libelle}) ? Cette action est irréversible.</p>
     </div>
 
     <!-- Boutons d'action -->

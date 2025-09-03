@@ -32,8 +32,10 @@
 
 	async function getData() {
 		try {
-			const res = await apiFetch(true, '/auth/users/all');
+			const res = await apiFetch(false, '/auth/agent/all');
 			const data = res.data;
+
+			console.log("====",data)
 
 			userdata = data;
 		} catch (error) {

@@ -262,7 +262,7 @@
 							{/each}
 						  {/if}
 						</tbody>
-					  </table>
+					</table>
 					  
 					{#if filteredData.length > 0 && totalPages > 1}
 						<Pagination

@@ -33,7 +33,7 @@
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await apiFetch(false,'/sites/create','POST',{
+			const res = await apiFetch(true,'/sites/create','POST',{
 					libelle: item.libelle
 				});
 			
