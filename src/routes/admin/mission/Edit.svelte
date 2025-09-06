@@ -104,6 +104,7 @@
 
 	async function SaveFunction() {
 		isLoad = true;
+			console.log( mission.ligneEquipes);
 		try {
 			const res = await apiFetch(true, '/missions/update/'+data?.id, 'PUT', {
 				libelle: mission.libelle,
@@ -116,7 +117,7 @@
 				ligneEquipes: mission.ligneEquipes
 			});
 
-			console.log(res)
+		
 
 			if (res) {
 				isLoad = false;
@@ -164,9 +165,9 @@
 	}
 
 	async function deleteFonction(mission:any,equipe:any) {
-        isLoad = true;
+
         try {
-            const res = await apiFetch(true,'/missions/delete/equipe','DELETE',{
+            const res = await apiFetch(true,'/missions/delete/equipe/'+equipe,'DELETE',{
 				mission_id:mission,
 				equipe_id:equipe
 
@@ -175,7 +176,7 @@
             if (res) {
                 notificationMessage = 'Utilisateur supprimé avec succès!';
                 notificationType = 'success';
-                open = false;
+                
             } else {
                 notificationMessage = res.data.message;
                 notificationType = 'error';
@@ -185,9 +186,9 @@
             notificationMessage = error?.message || 'Une erreur est survenue';
             notificationType = 'error';
             showNotification = true;
-            console.error("Error deleting:", error);
+           
         } finally {
-            isLoad = false;
+            
         }
     }
 
@@ -335,7 +336,7 @@
 										<div class="col-span-1 flex h-[42px] items-center justify-center">
 											<button
 												style="margin-top: -21px;"
-												on:click={() => supprimerIntervention(ligne.idF)}
+												on:click={() => supprimerIntervention(ligne.id)}
 												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold text-white capitalize transition duration-300 ease-in-out hover:text-white`}
 												title={`delete`}
 											>

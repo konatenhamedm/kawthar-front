@@ -28,7 +28,7 @@
 </script>
 
 <div bind:this={container} class="relative w-full " use:onClickOutside={() => open = false}>
-  <label class="block mb-2 text-sm font-medium text-gray-700">Select Options</label>
+  <label class="block mb-2 text-sm font-medium text-gray-700">Selectionnez un utilisateur</label>
   <div
     class="flex flex-wrap items-center gap-2 p-2 border rounded-md bg-white shadow-sm cursor-text border !border-black"
     on:click={() => (open = true)}>

@@ -1,72 +1,131 @@
 <script lang="ts">
 	import InputSimple from '$components/inputs/InputSimple.svelte';
-	import { BASE_URL_API } from '$lib/api';
+	import { apiFetch, BASE_URL_API } from '$lib/api';
 	
 	import Notification from '$components/_includes/Notification.svelte';
 	import InputSelect from '$components/inputs/InputSelect.svelte';
 	import { onMount } from 'svelte';
-    function cancelDelete() {
-        open = false;
-    }
+	import InputDateSimple from '$components/inputs/InputDateSimple.svelte';
+	import InputTextArea from '$components/inputs/InputTextArea.svelte';
+	import InputUserSelect from '$components/inputs/InputUserSelect.svelte';
+
 	export let open: boolean = false; // modal control
 	let isLoad = false;
 
 	let showNotification = false;
 	let notificationMessage = '';
 	let notificationType = 'info';
-
+	let equipes: any = [];
+	let entreprises: any = [];
+	let types: any = [];
 	// Initializing the user object with only email and status
-	let user: any = {
-		nom: '',
-		prenoms: '',
-		tel: '',
-		email: '',
-		d_type: ''
+
+	interface LigneEquipe {
+		id: any;
+		idF: any;
+		mission_id: any;
+		equipe_id: any;
+		date_fin_intervention: any;
+		date_debut_intervention: string;
+		description: string;
+	}
+
+	interface Mission {
+		libelle: string;
+		date_debut: string;
+		entreprise_id: string;
+		description: any;
+		mission_id: any;
+		adresse_mission: any;
+		date_fin: string;
+		type_mission_id: string;
+		ligneEquipes: LigneEquipe[];
+	}
+
+	// Initialisation des données avec les types
+	let mission: Mission = {
+		libelle: '',
+		date_debut: '',
+		entreprise_id: '',
+		mission_id : "",
+		description: '',
+		adresse_mission: '',
+		date_fin: '',
+		type_mission_id: '',
+		ligneEquipes: []
 	};
+
+	function formatDate(dateString: string): string {
+		return new Date(dateString).toISOString().split('T')[0];
+	}
+	function formatMissionEquipes(source = []) {
+		return source.map((item, index) => ({
+			id: item.id, // id d’origine
+			idF: item.id, // ou item.id si tu veux une copie exacte
+			date_debut_intervention: formatDate(item.date_debut_intervention),
+			date_fin_intervention: formatDate(item.date_fin_intervention),
+			description: item.description,
+			mission_id: item.id,
+			equipe_id: item.equipe?.id ?? null // on garde seulement l’id
+		}));
+	}
 
 	export let data: Record<string, string> = {};
 
 	function init(form: HTMLFormElement) {
+		console.log('LOLOLOLOO', data);
+		((mission.libelle = data?.libelle),
+			(mission.date_debut = data?.date_debut),
+			(mission.entreprise_id = data?.entrepriseMagasin != null ? data?.entrepriseMagasin.id : null),
+			(mission.type_mission_id = data?.typeMission != null ? data?.typeMission.id : null),
+			(mission.description = data?.description),
+			(mission.date_fin = data?.date_fin),
+			(mission.adresse_mission = data?.adresse_mission),
+			(mission.ligneEquipes = formatMissionEquipes(data?.mission_equipes)));
+	}
 
-        user.nom = data?.nom,
-        user.prenoms = data?.prenoms,
-        user.tel = data?.tel,
-        user.email = data?.email,
-        user.d_type = data?.d_type
-    }
+	async function getData() {
+		try {
+			const res = await apiFetch(true, '/parameters');
+			const data = res.data;
 
-	onMount(() => {});
+			equipes = data.equipes;
+			entreprises = data.entreprises;
+			types = data.type_missions;
+			console.log('', entreprises);
+		} catch (error) {
+			console.error('Error fetching villes:', error);
+		}
+	}
+
+	onMount(async () => {
+		await getData();
+	});
 
 	async function SaveFunction() {
 		isLoad = true;
 		try {
-			const res = await fetch(BASE_URL_API + '/auth/upfate/'+data?.id, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: user.email,
-                    tel: user.tel,
-                    login:user.login,
-                    nom:user.nom,
-                    prenoms:user.prenoms,
-                    d_type:user.d_type,
-                    fcm_token:''
-					
-				})
+			const res = await apiFetch(true, '/missions/update/'+data?.id, 'PUT', {
+				libelle: mission.libelle,
+				date_debut: mission.date_debut,
+				entreprise_id: mission.entreprise_id,
+				description: mission.description,
+				adresse_mission: mission.adresse_mission,
+				date_fin: mission.date_fin,
+				type_mission_id: mission.type_mission_id,
+				ligneEquipes: mission.ligneEquipes
 			});
-			console.log('content res', res);
 
-			if (res.ok) {
+			console.log(res)
+
+			if (res) {
 				isLoad = false;
 				open = false;
 				notificationMessage = 'Utilisateur modifié avec succès!';
 				notificationType = 'success';
 				showNotification = true;
-			} else if (res.status === 400) {
-				
-				notificationMessage = 'Utilisateur déjà inscrit';
+			} else {
+				notificationMessage = res.message;
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -87,74 +146,220 @@
 			event.preventDefault();
 		}
 	}
+
+	// Ajouter une nouvelle ligne d'intervention
+	function ajouterIntervention(): void {
+		mission.ligneEquipes = [
+			...mission.ligneEquipes,
+			{
+				id: null,
+				idF: Date.now(),
+				mission_id: data.id,
+				description: '',
+				equipe_id: '',
+				date_debut_intervention: '',
+				date_fin_intervention: ''
+			}
+		];
+	}
+
+	async function deleteFonction(mission:any,equipe:any) {
+        isLoad = true;
+        try {
+            const res = await apiFetch(true,'/missions/delete/equipe','DELETE',{
+				mission_id:mission,
+				equipe_id:equipe
+
+			});
+			
+            if (res) {
+                notificationMessage = 'Utilisateur supprimé avec succès!';
+                notificationType = 'success';
+                open = false;
+            } else {
+                notificationMessage = res.data.message;
+                notificationType = 'error';
+            }
+            showNotification = true;
+        } catch (error) {
+            notificationMessage = error?.message || 'Une erreur est survenue';
+            notificationType = 'error';
+            showNotification = true;
+            console.error("Error deleting:", error);
+        } finally {
+            isLoad = false;
+        }
+    }
+
+	// Supprimer une ligne d'intervention
+	async function supprimerIntervention(id: number) {
+		await deleteFonction(data?.id,id);
+		
+		mission.ligneEquipes = mission.ligneEquipes.filter((i) => i.idF !== id);
+	}
+	    function cancel() {
+        open = false;
+    }
 </script>
 
-
-
-
 <!-- Modal Content Wrapper -->
-<div class="bg-white rounded-lg shadow p-6 space-y-4">
+<div class="space-y-4 rounded-lg bg-white p-2">
+	<!-- Card Body -->
 
-    <!-- Card Body -->
-    <div class="space-y-6">
-        <form action="#" use:init>
-			<div class="grid grid-cols-2 gap-1 mb-1">
-				<div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Nom</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.nom || "Non spécifié"}
-					</div>
-				</div>
+	<div class="space-y-6">
+		<form action="#" use:init>
+			<!-- Champ Email -->
+			<!-- libelle: string; date_debut: string; date_fin: string; entreprise_id: string; type_mission_id:
+			string; adresse_mission: any; description: any; -->
 
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Prénoms</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.prenoms || "Non spécifié"}
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Téléphone</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.tel || "Non spécifié"}
-					</div>
-				</div>
+			<div class="grid grid-cols-3 gap-3">
+				<InputSimple
+					type="text"
+					fieldName="libelle"
+					label="Libellé"
+					bind:field={mission.libelle}
+					placeholder="Entrez le libelle"
+				/>
 
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Email</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.email || "Non spécifié"}
-					</div>
-				</div>
-
+				<InputDateSimple
+					fieldName="date_debut"
+					label="Date début"
+					bind:field={mission.date_debut}
+					placeholder="Date debut"
+				/>
+				<InputDateSimple
+					fieldName="date_fin"
+					label="Date fin"
+					bind:field={mission.date_fin}
+					placeholder="Date fin"
+				/>
 			</div>
-            <div class="grid grid-cols-1 gap-1 mb-1">
-                <div class="flex flex-col items-start">
-					<label class="font-semibold text-gray-700">Type utilisateur</label>
-					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700">
-						{user.d_type || "Non spécifié"}
+			<div class="grid grid-cols-3 gap-3">
+				<InputSelect
+					label="Entreprise"
+					bind:selectedId={mission.entreprise_id}
+					datas={entreprises}
+					id="entreprise_id"
+				/>
+
+				<InputSelect
+					label="Type mission"
+					bind:selectedId={mission.type_mission_id}
+					datas={types}
+					id="type_mission_id"
+				/>
+				<InputSimple
+					type="text"
+					fieldName="adresse_mission"
+					label="Addresse mission"
+					bind:field={mission.adresse_mission}
+					placeholder="Entrez l'addresse"
+				/>
+			</div>
+			<div class="mb-3 grid grid-cols-3 gap-3 border-b-2 border-black">
+				<InputTextArea
+					fieldName="description"
+					label="Description"
+					bind:field={mission.description}
+					placeholder="Entrez une description"
+				/>
+			</div>
+			<!-- <div class="shadow-gray col-span-12 shadow">
+				<div
+					class="bg-blue dark:bg-box-dark text-body dark:text-subtitle-dark rounded-10 m-0 p-0 text-[15px]"
+				>
+					<div
+						style="background-color:rgb(254 162 3)"
+						class="text-dark dark:text-title-dark dark:border-box-dark-up flex flex-wrap items-center justify-between border-b border-black px-[25px] py-[16px] text-[17px] font-medium"
+					>
+						<h4 class="dark:text-title-dark mb-0 text-lg font-medium text-white">
+							Liste des lignes équipe
+						</h4>
+
+					</div>
+					<div class="flex items-center gap-[15px] p-[20px]" style="background-color: #d8cccc;">
+						<div
+							class="bg-gray dark:bg-box-dark text-body dark:text-subtitle-dark dark:border-box-dark-up rounded-10 m-0 w-full border-0 border-black p-0 text-[15px]"
+						>
+							<div>
+								{#each mission.ligneEquipes as ligne, index (ligne.idF)}
+									<div class="grid grid-cols-12 items-end gap-3 border-b-2 border-black shadow bg-white  shadow rounded-md p-2">
+								
+										<div class="col-span-3">
+											<InputSelect
+												label="Equipe"
+												bind:selectedId={ligne.equipe_id}
+												datas={equipes}
+												id="equipe_id"
+											/>
+										</div>
+
+									
+										<div class="col-span-3">
+											<InputDateSimple
+												fieldName="date_debut_intervention"
+												label="Date début"
+												bind:field={ligne.date_debut_intervention}
+												placeholder="Entrez la date début"
+											/>
+										</div>
+
+										<div class="col-span-3">
+											<InputDateSimple
+												fieldName="date_fin_intervention"
+												label="Date fin"
+												bind:field={ligne.date_fin_intervention}
+												placeholder="Entrez la date fin"
+											/>
+										</div>
+
+						
+										<div class="col-span-2">
+											<InputSimple
+												type="text"
+												fieldName="description"
+												label="Description"
+												bind:field={ligne.description}
+												placeholder="Entrez un commentaire"
+											/>
+										</div>
+
+									
+										<div class="col-span-1 flex h-[42px] items-center justify-center">
+											<button
+												style="margin-top: -21px;"
+												on:click={() => supprimerIntervention(ligne.idF)}
+												class={`hover:bg-danger border-primary text-primary bg-danger inline-flex h-[30px] items-center justify-center gap-[6px] rounded-[4px] border-1 border-solid px-[10px] text-[6px] leading-[22px] font-semibold text-white capitalize transition duration-300 ease-in-out hover:text-white`}
+												title={`delete`}
+											>
+												<i class={`uil uil-trash-alt`}></i>
+											</button>
+										</div>
+									</div><div class="h-2 border-b-2 border-black">
+
+									</div>
+								{/each}
+							</div>
+						</div>
 					</div>
 				</div>
-            </div>
-			
-
+			</div> -->
 		</form>
-    </div>
+	</div>
 
-    <!-- Card Footer -->
-    <div class="flex justify-end pt-4 border-t border-gray-200">
-        <button style="margin-right: 9px;"
-        on:click={cancelDelete}
+	<!-- Card Footer -->
+	<div class="flex justify-end border-t border-gray-200 pt-4">
+		      <button style="margin-right: 9px;"
+        on:click={cancel}
         disabled={isLoad}
         class="px-4 py-2  mr-[9px] text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
     >
         Annuler
     </button>
-    </div>
-
+	</div>
 </div>
 
 <!-- Notification Component -->
 {#if showNotification}
-    <Notification message={notificationMessage} type={notificationType} duration={5000} />
+	<Notification message={notificationMessage} type={notificationType} duration={5000} />
 {/if}
-
