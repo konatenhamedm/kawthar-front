@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { BASE_URL_API } from '$lib/api';
+	
+    import { apiFetch, BASE_URL_API, BASE_URL_API_DEUX } from '$lib/api';
     import { Button, Modal } from 'flowbite-svelte';
     import Notification from '$components/_includes/Notification.svelte';
     import { onMount } from 'svelte';
@@ -20,14 +21,16 @@
     async function confirmDelete() {
         isLoad = true;
         try {
-            const res = await fetch(BASE_URL_API + '/auth/delete/' + data?.id, {
+            /* const res = await fetch(BASE_URL_API_DEUX + '/auth/delete/' + data?.id, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
+            }); */
+
+            const res = await apiFetch(false , '/auth/delete/' + data?.id,'DELETE');
             
-            if (res.ok) {
+            if (res) {
                 notificationMessage = 'Utilisateur supprimé avec succès!';
                 notificationType = 'success';
                 open = false;
