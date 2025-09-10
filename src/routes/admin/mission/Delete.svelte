@@ -76,6 +76,8 @@
         <p class="text-gray-500">Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
     </div>
 
+
+    <!-- {token} -->
     <!-- Boutons d'action -->
     <div class="flex justify-end pt-4 border-t border-gray-200 space-x-3">
         <button style="margin-right: 9px;"

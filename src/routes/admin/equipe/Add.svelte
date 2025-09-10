@@ -27,6 +27,14 @@
 		agents: []
 	};
 
+	// Ajout des messages d'erreur
+	let errors: any = {
+		libelle: '',
+		chef_equipe_id: '',
+		agents: '',
+		description: ''
+	};
+
 	export let data: Record<string, string> = {};
 	function init(form: HTMLFormElement) {}
 
@@ -56,7 +64,38 @@
 		return  source.map((item: Item) => item.id);
 		
 	}
+
+	// Fonction de validation
+	function validateForm() {
+		let isValid = true;
+		errors = { chef_equipe_id: '', agents: '', description: '' };
+
+		/* if (!item.libelle.trim()) {
+			errors.libelle = 'Le libellé est requis';
+			isValid = false;
+		} */
+
+		if (!item.chef_equipe_id) {
+			errors.chef_equipe_id = 'Le chef d\'équipe est requis';
+			isValid = false;
+		}
+
+		if (!item.agents || item.agents.length === 0) {
+			errors.agents = 'Au moins un agent doit être sélectionné';
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
 	async function SaveFunction() {
+		// Validation avant envoi
+		if (!validateForm()) {
+			notificationMessage = 'Veuillez renseigner  les champs requis du formulaire';
+			notificationType = 'error';
+			showNotification = true;
+			return;
+		}
 
 		console.log(agentIds(item.agents))
 		isLoad = true;
@@ -75,7 +114,7 @@
 				notificationType = 'success';
 				showNotification = true;
 			} else {
-				notificationMessage = 'Une erreur est ';
+				notificationMessage = 'Une erreur est survenue';
 				notificationType = 'error';
 				showNotification = true;
 			}
@@ -83,7 +122,7 @@
 			isLoad = false;
 
 			// Afficher une notification d'erreur
-			notificationMessage = error?.message;
+			notificationMessage = 'Veuillez renseigner  les champs requis du formulaire';
 			notificationType = 'error';
 			showNotification = true;
 
@@ -112,6 +151,8 @@
 					fieldName="libelle"
 					label="Libelle"
 					bind:field={item.libelle}
+					required={true}
+					error={errors.libelle}
 					placeholder="Entrez le nom de l'équipe"
 				/>
 
@@ -120,10 +161,20 @@
 					bind:selectedId={item.chef_equipe_id}
 					datas={userdata}
 					id="chef_equipe_id"
+					required={true}
+					error={errors.chef_equipe_id}
+					
 				/>
 			</div>
 			<div class="grid grid-cols-1 gap-3">
-				<InputMultiSelectUser options={userdata} bind:selected={item.agents} />
+				<InputMultiSelectUser 
+					options={userdata} 
+					bind:selected={item.agents} 
+					
+				/>
+				{#if errors.agents}
+					<p class="mt-1 text-sm text-red-500">{errors.agents}</p>
+				{/if}
 			</div>
 
 			<div class="grid grid-cols-1 gap-3">
@@ -132,6 +183,7 @@
 					label="Description"
 					bind:field={item.description}
 					placeholder="Entrez la description"
+					
 				/>
 			</div>
 		</form>

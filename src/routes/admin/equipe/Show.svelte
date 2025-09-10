@@ -28,7 +28,7 @@
 
 		item.libelle = data?.libelle,
         item.description = data?.description,
-        item.chef_equipe_id = data?.chef_equipe_id
+        item.chef_equipe_id = data?.chefEquipe.nom + ' ' + data?.chefEquipe.prenoms
     }
 
 	onMount(() => {});
@@ -62,7 +62,7 @@
                 <div class="flex flex-col items-start">
 					<label class="font-semibold text-gray-700">Description</label>
 					<div class="bg-white px-3 py-2 w-full border border-gray-300 rounded-md text-gray-700" style="height: 100px;">
-						{item.description || "Non spécifié"}
+						{item.description || "Aucune description"}
 					</div>
 				</div>
 				<div class="flex flex-col items-start">
