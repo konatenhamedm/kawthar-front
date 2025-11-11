@@ -7,8 +7,8 @@
     let notificationMessage = "";
     let notificationType = "info";
   
-    let username = "ko@gmail.com";
-    let password = "password123";
+    let username = "hamed_test";
+    let password = "admin123";
     $: authenticating = false;
     let showPassword = false; // To toggle password visibility
     $: message = "";

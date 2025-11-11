@@ -33,7 +33,7 @@
 			const res = await apiFetch(false, '/auth/users/all');
 			if (res) {
 				main_data = res.data as User[];
-				console.log('Données récupérées avec succès:', main_data);
+				console.log('Données récupérées avec succèsfff:', main_data);
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
 			}
@@ -218,7 +218,7 @@
 						  {:else if paginatedData.length === 0}
 							<tr>
 							  <td colspan="7" class="border border-gray-300 py-4 text-center">
-								Aucun résultat trouvé avec les critères de filtrage actuels
+								Aucun résultat trouvé avec les critères de filtrage actuels {JSON.stringify(main_data)}
 							  </td>
 							</tr>
 						  {:else}

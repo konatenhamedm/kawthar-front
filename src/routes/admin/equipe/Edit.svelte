@@ -34,7 +34,7 @@ let userdata :any = [];
 
         item.libelle = data?.libelle,
         item.description = data?.description,
-        item.chef_equipe_id = data?.chefEquipe.id,
+        item.chef_equipe_id = data?.chefEquipe?.id,
 		item.agents = data?.agents
     }
 

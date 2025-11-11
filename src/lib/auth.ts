@@ -5,6 +5,8 @@ import { BASE_URL_API_LOGIN,BASE_URL_API } from './api';
 
 
 export async function login(username_field: string, password: string) {
+  console.log('username_field', username_field);
+  console.log('password', password);
   try {
       const response = await fetch(`${BASE_URL_API_LOGIN}/auth/login`, {
           method: 'POST',
@@ -16,6 +18,8 @@ export async function login(username_field: string, password: string) {
       });
       
       const jsonData = await response.json();
+
+      console.log(jsonData);
       
 
 

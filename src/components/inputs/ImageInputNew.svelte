@@ -65,24 +65,20 @@
 			{#if link && showPreview}
 				<div class="flex-shrink-0">
 					<img
-						src={BASE_URL_API_UPLOAD+link}
+						src={BASE_URL_API_UPLOAD + link}
 						alt="Aperçu de l'image"
 						class="h-16 w-16 rounded-md border border-gray-300 object-cover"
 					/>
 				</div>
 			{/if}
-		{:else }
-    {#if previewUrl && showPreview}
-    <div class="flex-shrink-0">
-      <img
-        src={previewUrl}
-        alt="Aperçu de l'image"
-        class="h-16 w-16 rounded-md border border-gray-300 object-cover"
-      />
-    </div>
-  {/if}
-
-			
+		{:else if previewUrl && showPreview}
+			<div class="flex-shrink-0">
+				<img
+					src={previewUrl}
+					alt="Aperçu de l'image"
+					class="h-16 w-16 rounded-md border border-gray-300 object-cover"
+				/>
+			</div>
 		{/if}
 
 		<div class="flex-1">
