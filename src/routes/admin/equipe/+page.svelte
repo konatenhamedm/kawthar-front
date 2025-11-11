@@ -32,10 +32,7 @@
 			const res = await apiFetch(true, '/equipes');
 			if (res) {
 				main_data = res.data as Equipe[];
-				console.log('Données récupérées avec succès:', main_data);
-				console.log('Nombre de données:', main_data.length);
-				console.log('Type de main_data:', Array.isArray(main_data));
-				console.log('Premier élément:', main_data[0]);
+			
 			} else {
 				console.error('Erreur lors de la récupération des données:', res.statusText);
 			}
@@ -125,6 +122,10 @@
 		}
 	];
 
+	$: if (!openAdd || !openEdit || !openDelete) {
+		refreshDataIfNeeded();
+	}
+
 	function handlePageChange(event: CustomEvent) {
 		currentPage = event.detail;
 	}
@@ -176,7 +177,7 @@
 			<div class="p-[20px]">
 				<div class="scrollbar overflow-x-auto">
 					<table
-						class="min-w-full border border-gray-300 border-collapse text-start text-sm font-light"
+						class="min-w-full border-collapse border border-gray-300 text-start text-sm font-light"
 					>
 						<thead class="font-medium">
 							<tr class="bg-[#00baff]">
@@ -196,10 +197,10 @@
 									</div>
 								</th>
 
-								{#each ['Libelle', "Chef équipe"] as title}
+								{#each ['Libelle', 'Chef équipe'] as title}
 									<th
 										scope="col"
-										class="border border-gray-300 dark:bg-box-dark-up text-body-header text-title-white bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase"
+										class="dark:bg-box-dark-up text-body-header text-title-white border border-gray-300 bg-[#f8f9fb] px-4 py-3.5 text-start text-[15px] font-medium uppercase"
 									>
 										{title}
 									</th>
@@ -249,7 +250,7 @@
 								{#each paginatedData as item, i}
 									<tr class="group">
 										<td
-											class="border border-gray-300 text-dark dark:text-title-dark w-[60px] rounded-s-[6px] px-[25px] py-2.5 text-start font-medium"
+											class="text-dark dark:text-title-dark w-[60px] rounded-s-[6px] border border-gray-300 px-[25px] py-2.5 text-start font-medium"
 										>
 											<div class="mb-[0.125rem] block min-h-[1.5rem]">
 												<input
@@ -261,18 +262,19 @@
 											</div>
 										</td>
 										<td
-											class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+											class="text-dark dark:text-title-dark border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
 										>
 											{item.libelle}
 										</td>
 										<td
-											class="border border-gray-300 text-dark dark:text-title-dark px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
+											class="text-dark dark:text-title-dark border border-gray-300 px-4 py-2.5 text-[14px] font-normal whitespace-nowrap capitalize"
 										>
-											{item.chefEquipe?.nom || ''} {item.chefEquipe?.prenoms || ''}
+											{item.chefEquipe?.nom || ''}
+											{item.chefEquipe?.prenoms || ''}
 										</td>
 
 										<td
-											class="border border-gray-300 text-dark dark:text-title-dark rounded-e-[6px] px-4 py-2.5 text-[14px] font-normal capitalize text-end"
+											class="text-dark dark:text-title-dark rounded-e-[6px] border border-gray-300 px-4 py-2.5 text-end text-[14px] font-normal capitalize"
 											style="text-align: center;"
 										>
 											<Menu {item} onAction={handleAction} {actions} />
